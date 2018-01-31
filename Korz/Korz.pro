@@ -31,4 +31,11 @@ HEADERS += \
         mainmenu.h
 
 FORMS += \
-    ../../../golden/trunk/Golden/mainmenu.ui
+    mainmenu.ui
+
+RESOURCES += \
+    resources.qrc
+
+DISTFILES += \
+    Icons/gun_icon.png \
+    Icons/fire_icon.svg

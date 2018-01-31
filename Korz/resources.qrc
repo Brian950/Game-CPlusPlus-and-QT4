@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Icons/fire_icon.svg</file>
+        <file>Icons/gun_icon.png</file>
+    </qresource>
+</RCC>
