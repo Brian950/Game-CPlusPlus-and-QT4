@@ -18,6 +18,17 @@ public:
 private slots:
     void on_pushButton_clicked();
 
+    void on_pushButton_3_clicked();
+
+    void strength_value(int);
+
+    void speed_value(int);
+
+    void guns_value(int);
+
+    void luck_value(int);
+
+
 private:
     Ui::MainMenu *ui;
 };

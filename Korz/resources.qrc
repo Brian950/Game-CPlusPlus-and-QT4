@@ -2,5 +2,7 @@
     <qresource prefix="/">
         <file>Icons/fire_icon.svg</file>
         <file>Icons/gun_icon.png</file>
+        <file>Icons/trak2_panel2c.tga</file>
+        <file>Icons/trak2_plate2b.tga</file>
     </qresource>
 </RCC>
