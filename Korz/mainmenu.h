@@ -63,17 +63,7 @@ private slots:
 
 private:
     Ui::MainMenu *ui;
-    /*QGraphicsScene *compass;
-    QGraphicsRectItem *north_rect;
-    QGraphicsRectItem *south_rect;
-    QGraphicsRectItem *east_rect;
-    QGraphicsRectItem *west_rect;
-    QGraphicsRectItem *compassX;
-    QGraphicsRectItem *compassY;
-    QGraphicsTextItem *north_text;
-    QGraphicsTextItem *south_text;
-    QGraphicsTextItem *east_text;
-    QGraphicsTextItem *west_text;*/
+    QGraphicsScene *room_scene;
 
     int CHARACTER_POINTS = 20;
     int STR_LAST_VALUE = 0, SPD_LAST_VALUE = 0, GUN_LAST_VALUE = 0, LCK_LAST_VALUE = 0;

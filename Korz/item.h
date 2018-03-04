@@ -7,17 +7,13 @@
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 
-class Item : public QGraphicsItem
+class Item
 {
 public:
     Item();
-protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
 private:
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    bool clicked;
+
 
 };
 

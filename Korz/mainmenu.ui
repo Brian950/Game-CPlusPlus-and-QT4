@@ -59,7 +59,7 @@
        <string notr="true">background-color:#292d33;</string>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page">
        <property name="sizePolicy">
@@ -910,6 +910,12 @@ QProgressBar::chunk {
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>500</width>
+            <height>300</height>
+           </size>
           </property>
           <property name="maximumSize">
            <size>

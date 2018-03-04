@@ -53,6 +53,10 @@ MainMenu::MainMenu(QWidget *parent) :
     south_text->setPos(17, 55);
     west_text->setPos(-31, 8);
     east_text->setPos(61, 8);*/
+    room_scene = new QGraphicsScene(this);
+    room_scene->setSceneRect(-500, -250, 1000, 600);
+    room_scene->setFocus();
+    ui->game_view->setScene(room_scene);
 }
 
 MainMenu::~MainMenu()
@@ -224,6 +228,9 @@ void MainMenu::on_reset_button_clicked()
 void MainMenu::start_tutorial(Character *player)
 {
     ui->stackedWidget->setCurrentIndex(2);
+    player->setRect(-400, 0, 10, 100);
+    player->setFocus();
+    room_scene->addItem(player);
 }
 
 

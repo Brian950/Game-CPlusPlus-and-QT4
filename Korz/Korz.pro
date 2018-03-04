@@ -31,7 +31,8 @@ SOURCES += \
     db_controller.cpp \
     customrect.cpp \
     room.cpp \
-    item.cpp
+    item.cpp \
+    container.cpp
 
 HEADERS += \
         mainmenu.h \
@@ -39,7 +40,8 @@ HEADERS += \
     db_controller.h \
     customrect.h \
     room.h \
-    item.h
+    item.h \
+    container.h
 
 FORMS += \
     mainmenu.ui
