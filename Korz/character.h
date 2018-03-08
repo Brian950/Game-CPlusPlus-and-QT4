@@ -3,11 +3,11 @@
 #include <vector>
 #include <QString>
 #include <QKeyEvent>
-#include <QGraphicsRectItem>
+#include <QGraphicsPixmapItem>
 
 using namespace std;
 
-class Character : public QGraphicsRectItem
+class Character : public QGraphicsPixmapItem
 {
 private:
     QString name;
@@ -18,8 +18,11 @@ private:
     int special_ability;
     int location;
     int health;
-    vector<int> inventory_array;
-    QSet<int> pressedKeys;
+    vector<int> inventory_array; //String of item ids separated by ':' to store inventory.
+    QSet<int> pressedKeys; //Holds all currently held down keys
+    QPixmap character_pixmap;
+    bool moveable;
+    int x_limit; //Sets limit on where on the screen the player can move to
 
 public:
     Character();
@@ -42,6 +45,7 @@ public:
     void set_location(int);
     int get_health();
     void set_health(int);
+    void set_x_limit(int);
     vector<int> get_inventory();
     void set_inventory(vector<int>);
 

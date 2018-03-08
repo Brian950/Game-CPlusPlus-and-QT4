@@ -924,7 +924,8 @@ QProgressBar::chunk {
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">background-color:grey;</string>
+           <string notr="true">background-color:grey;
+border-Image:url(:/Rooms/tutorial_room.png);</string>
           </property>
          </widget>
         </item>
@@ -965,7 +966,7 @@ QProgressBar::chunk {
            <bool>true</bool>
           </property>
           <property name="margin">
-           <number>0</number>
+           <number>4</number>
           </property>
          </widget>
         </item>

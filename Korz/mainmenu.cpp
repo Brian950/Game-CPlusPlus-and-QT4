@@ -1,7 +1,5 @@
 #include "mainmenu.h"
 #include "ui_mainmenu.h"
-#include <QStyle>
-#include <QDesktopWidget>
 
 using namespace std;
 
@@ -13,9 +11,9 @@ MainMenu::MainMenu(QWidget *parent) :
     //this->showFullScreen();
 
     QString ability_default="None Selected";
-    QString ability_crackshot="Crackshot: Deal a devastating ranged blow. (Cooldown 200s)";
-    QString ability_beserker="Beserker: Take no damage and do double for 30s. (Cooldown 200s)";
-    QString ability_ghost="Ghost: Remain unseen by enemies for 60s. (Cooldown 200s)";
+    QString ability_crackshot="Crackshot: Deal a devastating ranged blow. (Cooldown 60s)";
+    QString ability_beserker="Beserker: Take no damage and do double for 30s. (Cooldown 60s)";
+    QString ability_ghost="Ghost: Remain unseen by enemies for 30s. (Cooldown 60s)";
     ui->ability_box->addItem(ability_default);
     ui->ability_box->addItem(ability_crackshot);
     ui->ability_box->addItem(ability_beserker);
@@ -34,29 +32,13 @@ MainMenu::MainMenu(QWidget *parent) :
     //Progress bar updates
     connect(ui->name_edit, SIGNAL(editingFinished()), this, SLOT(update_progress(int)));
 
-
-    /*compass = new QGraphicsScene(this);
-    ui->compass_view->setScene(compass);
-    QPen black_pen(Qt::black);
-    QBrush grey_brush(Qt::gray);
-    compassX = compass->addRect(-20, 17, 100, 5, black_pen, grey_brush);
-    compassX = compass->addRect(22, -20, 5, 100, black_pen, grey_brush);
-    north_rect = compass->addRect(5, -47, 40, 40, black_pen, grey_brush);
-    south_rect = compass->addRect(5, 47, 40, 40, black_pen, grey_brush);
-    west_rect = compass->addRect(-40, 0, 40, 40, black_pen, grey_brush);
-    east_rect = compass->addRect(50, 0, 40, 40, black_pen, grey_brush);
-    north_text = compass->addText("N");
-    south_text = compass->addText("S");
-    west_text = compass->addText("W");
-    east_text = compass->addText("E");
-    north_text->setPos(16, -40);
-    south_text->setPos(17, 55);
-    west_text->setPos(-31, 8);
-    east_text->setPos(61, 8);*/
-    room_scene = new QGraphicsScene(this);
-    room_scene->setSceneRect(-500, -250, 1000, 600);
-    room_scene->setFocus();
-    ui->game_view->setScene(room_scene);
+    tutorial_scene = new QGraphicsScene(this);
+    tutorial_scene->setSceneRect(-50, -250, 1000, 600);
+    Container *tut_cont_1 = new Container(1);
+    tut_cont_1->setPos(400, 100);
+    tutorial_scene->addItem(tut_cont_1);
+    tutorial_scene->setFocus();
+    ui->game_view->setScene(tutorial_scene);
 }
 
 MainMenu::~MainMenu()
@@ -228,9 +210,17 @@ void MainMenu::on_reset_button_clicked()
 void MainMenu::start_tutorial(Character *player)
 {
     ui->stackedWidget->setCurrentIndex(2);
-    player->setRect(-400, 0, 10, 100);
+    player->setPos(50, 0);
     player->setFocus();
-    room_scene->addItem(player);
+    tutorial_scene->addItem(player);
+    player->set_x_limit(300);
+
+    std::thread text_thread([]{
+                    ui->story_label->setText("Welcome to Kroz.");
+                });
+
+   text_thread.join();
+
 }
 
 

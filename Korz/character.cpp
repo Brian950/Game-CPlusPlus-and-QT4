@@ -1,4 +1,5 @@
 #include "character.h"
+#include <QDebug>
 
 Character::Character()
 {
@@ -15,7 +16,12 @@ Character::Character(QString n, int str, int spd, int gn, int lk, int spc)
     location = 0;
     health = 100;
     inventory_array.reserve(5+str);
+    character_pixmap = QPixmap(":/Icons/soldier.png");
+    moveable = true;
+    x_limit = 850;
     setFlag(QGraphicsItem::ItemIsFocusable);
+    setPixmap(character_pixmap);
+    setScale(0.2);
 }
 
 void Character::keyPressEvent(QKeyEvent *event)
@@ -23,8 +29,9 @@ void Character::keyPressEvent(QKeyEvent *event)
     pressedKeys += (event)->key(); //When a key is pressed it gets stored in this array. When it is released it gets removed.
 
     if(pressedKeys.size() == 1){
-        if(pressedKeys.contains(Qt::Key_D) && x() < 850){
+        if(pressedKeys.contains(Qt::Key_D) && x() < 850 && x() < x_limit){
             setPos(x()+10+speed, y());
+            qDebug() << " " << x() << " ";
         }
         else if(pressedKeys.contains(Qt::Key_A) && x() > -50){
             setPos(x()-10-speed, y());
@@ -36,11 +43,11 @@ void Character::keyPressEvent(QKeyEvent *event)
             setPos(x(), y()+10+speed);
         }
         else if(pressedKeys.contains(Qt::Key_Space)){
-            printf("Weapon fired.\n");
+
         }
     }
     else if(pressedKeys.size() == 2){
-        if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() > -250){
+        if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() > -250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()-10-speed);
         }
@@ -48,7 +55,7 @@ void Character::keyPressEvent(QKeyEvent *event)
             setPos(x()-10-speed, y());
             setPos(x(), y()-10-speed);
         }
-        else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() < 250){
+        else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() < 250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()+10+speed);
         }
@@ -58,23 +65,19 @@ void Character::keyPressEvent(QKeyEvent *event)
         }
         else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_Space) && y() < 250){
             setPos(x(), y()+10+speed);
-            printf("Weapon Fired.\n");
         }
         else if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_Space) && y() > -250){
             setPos(x(), y()-10-speed);
-            printf("Weapon Fired.\n");
         }
         else if(pressedKeys.contains(Qt::Key_A) && pressedKeys.contains(Qt::Key_Space) && x() > -50){
             setPos(x()-10-speed, y());
-            printf("Weapon Fired.\n");
         }
-        else if(pressedKeys.contains(Qt::Key_D) && pressedKeys.contains(Qt::Key_Space) && x() < 850){
+        else if(pressedKeys.contains(Qt::Key_D) && pressedKeys.contains(Qt::Key_Space) && x() < 850 && x() < x_limit){
             setPos(x()+10+speed, y());
-            printf("Weapon Fired.\n");
         }
     }
     else if(pressedKeys.size() == 3){
-        if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() > -250){
+        if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() > -250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()-10-speed);
         }
@@ -82,48 +85,31 @@ void Character::keyPressEvent(QKeyEvent *event)
             setPos(x()-10-speed, y());
             setPos(x(), y()-10-speed);
         }
-        else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() < 250){
+        else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() < 250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()+10+speed);
         }
         else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_A) && x() > -50 && y() < 250){
             setPos(x()-10-speed, y());
             setPos(x(), y()+10+speed);
-            printf("Weapon Fired.\n");
         }
-        else if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_D) && pressedKeys.contains(Qt::Key_Space) && x() < 850 && y() > -250){
+        else if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_D) && pressedKeys.contains(Qt::Key_Space) && x() < 850 && y() > -250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()-10-speed);
-            printf("Weapon Fired.\n");
         }
         else if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_A) && pressedKeys.contains(Qt::Key_Space) && x() > -50 && y() > -250){
             setPos(x()-10-speed, y());
             setPos(x(), y()-10-speed);
-            printf("Weapon Fired.\n");
         }
-        else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_D) && pressedKeys.contains(Qt::Key_Space) && x() < 850 && y() < 250){
+        else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_D) && pressedKeys.contains(Qt::Key_Space) && x() < 850 && y() < 250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()+10+speed);
-            printf("Weapon Fired.\n");
         }
         else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_A) && pressedKeys.contains(Qt::Key_Space) && x() > -50 && y() < 250){
             setPos(x()-10-speed, y());
             setPos(x(), y()+10+speed);
-            printf("Weapon Fired.\n");
         }
     }
-    /*if(event->key() == Qt::Key_D && x() < 850){
-        setPos(x()+10+speed, y());
-    }
-    else if(event->key() == Qt::Key_A && x() > -50){
-        setPos(x()-10-speed, y());
-    }
-    else if(event->key() == Qt::Key_W && y() > -250){
-        setPos(x(), y()-10-speed);
-    }
-    else if(event->key() == Qt::Key_S && y() < 250){
-        setPos(x(), y()+10+speed);
-    }*/
 }
 
 void Character::keyReleaseEvent(QKeyEvent *event)
@@ -210,6 +196,10 @@ int Character::get_health()
 void Character::set_health(int h)
 {
     health = h;
+}
+
+void Character::set_x_limit(int limit){
+    x_limit = limit;
 }
 
 vector<int> Character::get_inventory()

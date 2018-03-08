@@ -10,7 +10,9 @@
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
-#include <textrect.h>
+#include <QStyle>
+#include <QDesktopWidget>
+#include "container.h"
 
 namespace Ui {
 class MainMenu;
@@ -63,7 +65,7 @@ private slots:
 
 private:
     Ui::MainMenu *ui;
-    QGraphicsScene *room_scene;
+    QGraphicsScene *tutorial_scene;
 
     int CHARACTER_POINTS = 20;
     int STR_LAST_VALUE = 0, SPD_LAST_VALUE = 0, GUN_LAST_VALUE = 0, LCK_LAST_VALUE = 0;

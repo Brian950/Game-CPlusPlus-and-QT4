@@ -30,7 +30,6 @@ SOURCES += \
     character.cpp \
     db_controller.cpp \
     customrect.cpp \
-    room.cpp \
     item.cpp \
     container.cpp
 
@@ -39,7 +38,6 @@ HEADERS += \
     character.h \
     db_controller.h \
     customrect.h \
-    room.h \
     item.h \
     container.h
 
@@ -51,4 +49,6 @@ RESOURCES += \
 
 DISTFILES += \
     Icons/gun_icon.png \
-    Icons/fire_icon.svg
+    Icons/fire_icon.svg \
+    Rooms/tutorial_room.png \
+    Icons/soldier.png
