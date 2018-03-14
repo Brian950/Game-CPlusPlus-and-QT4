@@ -8,5 +8,6 @@
         <file>Icons/wooden_crate.png</file>
         <file>Rooms/tutorial_room.png</file>
         <file>Icons/soldier.png</file>
+        <file>Icons/soldier-left.png</file>
     </qresource>
 </RCC>

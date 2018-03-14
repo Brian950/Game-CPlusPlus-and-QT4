@@ -1,5 +1,4 @@
 #include "character.h"
-#include <QDebug>
 
 Character::Character()
 {
@@ -16,11 +15,12 @@ Character::Character(QString n, int str, int spd, int gn, int lk, int spc)
     location = 0;
     health = 100;
     inventory_array.reserve(5+str);
-    character_pixmap = QPixmap(":/Icons/soldier.png");
+    right_pixmap = QPixmap(":/Icons/soldier.png");
+    left_pixmap = QPixmap(":/Icons/soldier-left.png");
     moveable = true;
     x_limit = 850;
     setFlag(QGraphicsItem::ItemIsFocusable);
-    setPixmap(character_pixmap);
+    setPixmap(right_pixmap);
     setScale(0.2);
 }
 
@@ -31,10 +31,11 @@ void Character::keyPressEvent(QKeyEvent *event)
     if(pressedKeys.size() == 1){
         if(pressedKeys.contains(Qt::Key_D) && x() < 850 && x() < x_limit){
             setPos(x()+10+speed, y());
-            qDebug() << " " << x() << " ";
+            setPixmap(right_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_A) && x() > -50){
             setPos(x()-10-speed, y());
+            setPixmap(left_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_W) && y() > -250){
             setPos(x(), y()-10-speed);
@@ -50,18 +51,22 @@ void Character::keyPressEvent(QKeyEvent *event)
         if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() > -250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()-10-speed);
+            setPixmap(right_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_A) && x() > -50 && y() > -250){
             setPos(x()-10-speed, y());
             setPos(x(), y()-10-speed);
+            setPixmap(left_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() < 250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()+10+speed);
+            setPixmap(right_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_A) && x() > -50 && y() < 250){
             setPos(x()-10-speed, y());
             setPos(x(), y()+10+speed);
+            setPixmap(left_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_Space) && y() < 250){
             setPos(x(), y()+10+speed);
@@ -71,43 +76,53 @@ void Character::keyPressEvent(QKeyEvent *event)
         }
         else if(pressedKeys.contains(Qt::Key_A) && pressedKeys.contains(Qt::Key_Space) && x() > -50){
             setPos(x()-10-speed, y());
+            setPixmap(left_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_D) && pressedKeys.contains(Qt::Key_Space) && x() < 850 && x() < x_limit){
             setPos(x()+10+speed, y());
+            setPixmap(right_pixmap);
         }
     }
     else if(pressedKeys.size() == 3){
         if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() > -250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()-10-speed);
+            setPixmap(right_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_A) && x() > -50 && y() > -250){
             setPos(x()-10-speed, y());
             setPos(x(), y()-10-speed);
+            setPixmap(left_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_D) && x() < 850 && y() < 250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()+10+speed);
+            setPixmap(right_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_A) && x() > -50 && y() < 250){
             setPos(x()-10-speed, y());
             setPos(x(), y()+10+speed);
+            setPixmap(left_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_D) && pressedKeys.contains(Qt::Key_Space) && x() < 850 && y() > -250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()-10-speed);
+            setPixmap(right_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_W) && pressedKeys.contains(Qt::Key_A) && pressedKeys.contains(Qt::Key_Space) && x() > -50 && y() > -250){
             setPos(x()-10-speed, y());
             setPos(x(), y()-10-speed);
+            setPixmap(left_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_D) && pressedKeys.contains(Qt::Key_Space) && x() < 850 && y() < 250 && x() < x_limit){
             setPos(x()+10+speed, y());
             setPos(x(), y()+10+speed);
+            setPixmap(right_pixmap);
         }
         else if(pressedKeys.contains(Qt::Key_S) && pressedKeys.contains(Qt::Key_A) && pressedKeys.contains(Qt::Key_Space) && x() > -50 && y() < 250){
             setPos(x()-10-speed, y());
             setPos(x(), y()+10+speed);
+            setPixmap(left_pixmap);
         }
     }
 }
@@ -198,7 +213,13 @@ void Character::set_health(int h)
     health = h;
 }
 
-void Character::set_x_limit(int limit){
+int Character::get_x_limit()
+{
+    return x_limit;
+}
+
+void Character::set_x_limit(int limit)
+{
     x_limit = limit;
 }
 

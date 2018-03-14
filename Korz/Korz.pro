@@ -31,7 +31,9 @@ SOURCES += \
     db_controller.cpp \
     customrect.cpp \
     item.cpp \
-    container.cpp
+    container.cpp \
+    storythread.cpp \
+    playercollisionsthread.cpp
 
 HEADERS += \
         mainmenu.h \
@@ -39,7 +41,9 @@ HEADERS += \
     db_controller.h \
     customrect.h \
     item.h \
-    container.h
+    container.h \
+    storythread.h \
+    playercollisionsthread.h
 
 FORMS += \
     mainmenu.ui

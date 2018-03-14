@@ -179,9 +179,9 @@ void MainMenu::on_ability_box_currentIndexChanged(int index)
 void MainMenu::on_finish_button_clicked()
 {
     if(ui->character_progress->value() == 100 && CHARACTER_POINTS == 0){
-        Character *player = new Character(CHARACTER_NAME, STR_LAST_VALUE, SPD_LAST_VALUE, GUN_LAST_VALUE, LCK_LAST_VALUE, ui->ability_box->currentIndex());
-        DB_Controller *dbc = new DB_Controller("/home/brian/Korz/trunk/Korz/kroz.db");
-        start_tutorial(player);
+        player = new Character(CHARACTER_NAME, STR_LAST_VALUE, SPD_LAST_VALUE, GUN_LAST_VALUE, LCK_LAST_VALUE, ui->ability_box->currentIndex());
+        dbc = new DB_Controller("/home/brian/Korz/trunk/Korz/kroz.db");
+        tutorial_part_1();
     }
     else{
         QMessageBox msgBox;
@@ -207,31 +207,54 @@ void MainMenu::on_reset_button_clicked()
     ui->ability_box->setCurrentIndex(0);
 }
 
-void MainMenu::start_tutorial(Character *player)
+void MainMenu::tutorial_part_1()
 {
     ui->stackedWidget->setCurrentIndex(2);
-    player->setPos(50, 0);
     player->setFocus();
+    player->setPos(50, 0);
     tutorial_scene->addItem(player);
     player->set_x_limit(300);
-
-    std::thread text_thread([]{
-                    ui->story_label->setText("Welcome to Kroz.");
-                });
-
-   text_thread.join();
-
+    story_thread = new StoryThread(this);
+    connect(story_thread, SIGNAL(update_story(QString)),this, SLOT(update_story(QString)));
+    connect(story_thread, SIGNAL(spawn_tutorial_rects()), this, SLOT(spawn_tutorial_rects()));
+    story_thread->start();
 }
 
+void MainMenu::tutorial_part_2(){
+    ui->story_label->setText("Well done! Now lets see what's in that box.");
+}
 
+void MainMenu::spawn_tutorial_rects(){
+    QBrush green_brush(Qt::green);
+    rect1 = new CustomRect();
+    rect1->setPos(40, -120);
+    rect1->setZValue(-1);
+    tutorial_scene->addItem(rect1);
+    rect2 = new CustomRect();
+    rect2->setPos(40, 200);
+    rect2->setZValue(-1);
+    tutorial_scene->addItem(rect2);
+    rect3 = new CustomRect();
+    rect3->setPos(200, -120);
+    rect3->setZValue(-1);
+    tutorial_scene->addItem(rect3);
+    rect4 = new CustomRect();
+    rect4->setPos(200,200);
+    rect4->setZValue(-1);
+    tutorial_scene->addItem(rect4);
+}
 
+void MainMenu::update_story(QString story_text)
+{
+    ui->story_label->setText(story_text);
+}
 
 void MainMenu::on_pushButton_3_clicked()
 {
-    Character *player = new Character("Brian", 5, 5, 5, 5, 1);
-    DB_Controller *dbc = new DB_Controller("/home/brian/Korz/trunk/Korz/kroz.db");
+    player = new Character("Brian", 5, 10, 5, 5, 1);
+    dbc = new DB_Controller("/home/brian/Korz/trunk/Korz/kroz.db");
     dbc->add_player(player->get_name(), player->get_strength(), player->get_speed(), player->get_guns(), player->get_luck(), player->get_special());
-    start_tutorial(player);
+    tutorial_part_1();
 }
 
 void MainMenu::on_north_button_clicked()
