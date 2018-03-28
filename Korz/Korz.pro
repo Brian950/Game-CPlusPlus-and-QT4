@@ -33,7 +33,8 @@ SOURCES += \
     item.cpp \
     container.cpp \
     storythread.cpp \
-    playercollisionsthread.cpp
+    weapon.cpp \
+    medkit.cpp
 
 HEADERS += \
         mainmenu.h \
@@ -43,7 +44,8 @@ HEADERS += \
     item.h \
     container.h \
     storythread.h \
-    playercollisionsthread.h
+    weapon.h \
+    medkit.h
 
 FORMS += \
     mainmenu.ui

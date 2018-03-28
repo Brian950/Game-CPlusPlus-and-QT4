@@ -14,7 +14,7 @@ Character::Character(QString n, int str, int spd, int gn, int lk, int spc)
     special_ability = spc;
     location = 0;
     health = 100;
-    inventory_array.reserve(5+str);
+    inventory_string = "";
     right_pixmap = QPixmap(":/Icons/soldier.png");
     left_pixmap = QPixmap(":/Icons/soldier-left.png");
     moveable = true;
@@ -132,8 +132,6 @@ void Character::keyReleaseEvent(QKeyEvent *event)
     pressedKeys -= (event)->key();
 }
 
-
-
 QString Character::get_name()
 {
     return name;
@@ -223,13 +221,36 @@ void Character::set_x_limit(int limit)
     x_limit = limit;
 }
 
-vector<int> Character::get_inventory()
+QString Character::get_inventory()
 {
-    return inventory_array;
+    return inventory_string;
 }
 
-void Character::set_inventory(vector<int> i)
+void Character::set_inventory(QString i)
 {
-    inventory_array = i;
+    inventory_string = i;
+}
+
+int Character::get_inventory_size()
+{
+    QStringList item_list = inventory_string.split(":");
+    return item_list.length();
+}
+
+
+
+int Character::add_item_to_inventory(int id){
+    QStringList item_list = inventory_string.split(":");
+    if(item_list.length() == 0){
+        inventory_string.append(id);
+        return 0;
+    }
+    else if(item_list.length() < 10){
+        inventory_string.append(":"+id);
+        return 0;
+    }
+    else{
+        return 1;
+    }
 }
 

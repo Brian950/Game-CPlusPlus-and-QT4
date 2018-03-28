@@ -24,6 +24,7 @@ MainMenu::MainMenu(QWidget *parent) :
     ui->luck_value->setButtonSymbols(QSpinBox::PlusMinus);
 
     ui->points_label->setNum(CHARACTER_POINTS);
+
     //Character attributes Signals/Slots
     connect(ui->strength_value, SIGNAL(valueChanged(int)), this, SLOT(strength_value(int)));
     connect(ui->speed_value, SIGNAL(valueChanged(int)), this, SLOT(speed_value(int)));
@@ -34,8 +35,10 @@ MainMenu::MainMenu(QWidget *parent) :
 
     tutorial_scene = new QGraphicsScene(this);
     tutorial_scene->setSceneRect(-50, -250, 1000, 600);
-    Container *tut_cont_1 = new Container(1);
-    tut_cont_1->setPos(400, 100);
+    Container *tut_cont_1 = new Container(1, player);
+    tut_cont_1->setPos(450, 100);
+    connect(tut_cont_1, SIGNAL(open_inventory()), this, SLOT(open_inventory()));
+
     tutorial_scene->addItem(tut_cont_1);
     tutorial_scene->setFocus();
     ui->game_view->setScene(tutorial_scene);
@@ -215,33 +218,47 @@ void MainMenu::tutorial_part_1()
     tutorial_scene->addItem(player);
     player->set_x_limit(300);
     story_thread = new StoryThread(this);
+    story_thread->set_current_scene(*tutorial_scene);
     connect(story_thread, SIGNAL(update_story(QString)),this, SLOT(update_story(QString)));
     connect(story_thread, SIGNAL(spawn_tutorial_rects()), this, SLOT(spawn_tutorial_rects()));
     story_thread->start();
 }
 
 void MainMenu::tutorial_part_2(){
-    ui->story_label->setText("Well done! Now lets see what's in that box.");
+    story_thread->start();
 }
 
 void MainMenu::spawn_tutorial_rects(){
-    QBrush green_brush(Qt::green);
-    rect1 = new CustomRect();
+    rect1 = new CustomRect(player);
     rect1->setPos(40, -120);
     rect1->setZValue(-1);
     tutorial_scene->addItem(rect1);
-    rect2 = new CustomRect();
+    rect2 = new CustomRect(player);
     rect2->setPos(40, 200);
     rect2->setZValue(-1);
     tutorial_scene->addItem(rect2);
-    rect3 = new CustomRect();
+    rect3 = new CustomRect(player);
     rect3->setPos(200, -120);
     rect3->setZValue(-1);
     tutorial_scene->addItem(rect3);
-    rect4 = new CustomRect();
+    rect4 = new CustomRect(player);
     rect4->setPos(200,200);
     rect4->setZValue(-1);
     tutorial_scene->addItem(rect4);
+    //Rectangles for tutorial first task
+    connect(rect1, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
+    connect(rect2, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
+    connect(rect3, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
+    connect(rect4, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
+}
+
+//Once the four tutorial rects are destroyed, then the next task is triggered
+void MainMenu::rectangle_destroyed(){
+    tut_rect_counter++;
+    if(tut_rect_counter == 4){
+        player->set_x_limit(500);
+        tutorial_part_2();
+    }
 }
 
 void MainMenu::update_story(QString story_text)
@@ -253,8 +270,13 @@ void MainMenu::on_pushButton_3_clicked()
 {
     player = new Character("Brian", 5, 10, 5, 5, 1);
     dbc = new DB_Controller("/home/brian/Korz/trunk/Korz/kroz.db");
-    dbc->add_player(player->get_name(), player->get_strength(), player->get_speed(), player->get_guns(), player->get_luck(), player->get_special());
+    dbc->add_player(player->get_name(), player->get_strength(), player->get_speed(), player->get_guns(), player->get_luck(), player->get_special(), player->get_location(),player->get_health(), player->get_inventory());
     tutorial_part_1();
+}
+
+void MainMenu::open_inventory(){
+    QString inventory = player->get_inventory();
+
 }
 
 void MainMenu::on_north_button_clicked()
@@ -273,6 +295,31 @@ void MainMenu::on_east_button_clicked()
 }
 
 void MainMenu::on_west_button_clicked()
+{
+
+}
+
+void MainMenu::on_inventory_back_button_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(2);
+}
+
+void MainMenu::on_add_to_inventory_button_clicked()
+{
+    if(player->get_inventory_size() < 10){
+        QListWidgetItem *item = ui->external_inventory->currentItem();
+        ui->player_inventory->addItem(item);
+        ui->external_inventory->removeItemWidget(item);
+    }
+    else{
+        QMessageBox msgBox;
+        msgBox.setText("Inventory full, drop items to free up space.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+    }
+}
+
+void MainMenu::on_remove_from_inventory_button_clicked()
 {
 
 }

@@ -1,9 +1,12 @@
 #include "customrect.h"
 
-
-
-CustomRect::CustomRect()
+CustomRect::CustomRect(Character *player)
 {
+    this->player = player;
+    //Timer used to update the rect to check for a collision with the player
+    QTimer *timer = new QTimer();
+    connect(timer, SIGNAL(timeout()), this, SLOT(update_rect()));
+    timer->start(500);
 }
 
 QRectF CustomRect::boundingRect() const
@@ -19,7 +22,14 @@ void CustomRect::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     painter->fillRect(bounds, green_brush);
 }
 
-CustomRect::~CustomRect(){
-
+void CustomRect::update_rect(){
+    for(int x = 0; x < player->collidingItems().size(); x++){
+        if(player->collidingItems().at(x) == this){
+            emit destroyed();
+            delete this;
+        }
+    }
 }
+
+CustomRect::~CustomRect(){}
 

@@ -10,7 +10,7 @@ class DB_Controller
 {
 public:
     DB_Controller(const QString&);
-    void add_player(QString, int, int, int, int, int);
+    void add_player(QString, int, int, int, int, int, int, int, QString);
 private:
     QSqlDatabase kroz_db;
 };

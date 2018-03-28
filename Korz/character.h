@@ -5,7 +5,6 @@
 #include <QKeyEvent>
 #include <QGraphicsItem>
 #include <QGraphicsPixmapItem>
-#include "customrect.h"
 
 using namespace std;
 
@@ -20,7 +19,7 @@ private:
     int special_ability;
     int location;
     int health;
-    vector<int> inventory_array; //String of item ids separated by ':' to store inventory.
+    QString inventory_string; //String of item ids separated by ':' to store inventory.
     bool moveable;
     int x_limit; //Sets limit on where on the screen the player can move to
 
@@ -50,9 +49,10 @@ public:
     void set_health(int);
     int get_x_limit();
     void set_x_limit(int);
-    vector<int> get_inventory();
-    void set_inventory(vector<int>);
-
+    QString get_inventory();
+    int add_item_to_inventory(int);
+    void set_inventory(QString);
+    int get_inventory_size();
 };
 
 #endif // CHARACTER_H

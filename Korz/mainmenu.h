@@ -14,6 +14,7 @@
 #include <storythread.h>
 #include <QDesktopWidget>
 #include "container.h"
+#include "playercollisionsthread.h"
 
 namespace Ui {
 class MainMenu;
@@ -26,51 +27,36 @@ class MainMenu : public QMainWindow
 public:
     explicit MainMenu(QWidget *parent = 0);
     ~MainMenu();
-
-    //void keyPressEvent(QKeyEvent *event);
-    //void keyReleaseEvent(QKeyEvent *event);
+//Function prototype examples:
 public slots:
     void update_story(QString story_text);
     void spawn_tutorial_rects();
+    void tutorial_part_2();
+    void rectangle_destroyed();
+    void open_inventory();
 
 private slots:
     void on_pushButton_clicked();
-
     void on_back_button_1_clicked();
-
     void strength_value(int);
-
     void speed_value(int);
-
     void guns_value(int);
-
     void luck_value(int);
-
     void update_progress(int);
-
     void on_finish_button_clicked();
-
     void on_name_edit_editingFinished();
-
     void set_attribute_value(int, int);
-
     void on_reset_button_clicked();
-
     void on_ability_box_currentIndexChanged(int index);
-
     void tutorial_part_1();
-
-    void tutorial_part_2();
-
     void on_pushButton_3_clicked();
-
     void on_north_button_clicked();
-
     void on_south_button_clicked();
-
     void on_east_button_clicked();
-
     void on_west_button_clicked();
+    void on_inventory_back_button_clicked();
+    void on_add_to_inventory_button_clicked();
+    void on_remove_from_inventory_button_clicked();
 
 private:
     Ui::MainMenu *ui;
@@ -90,7 +76,7 @@ private:
     CustomRect *rect2;
     CustomRect *rect3;
     CustomRect *rect4;
-
+    int tut_rect_counter = 0;
 };
 
 #endif // MAINMENU_H

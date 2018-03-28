@@ -5,6 +5,7 @@
 #include <QString>
 #include <QFile>
 #include <QTextStream>
+#include <QGraphicsScene>
 
 class StoryThread : public QThread
 {
@@ -12,6 +13,7 @@ class StoryThread : public QThread
 public:
     explicit StoryThread(QObject *parent = 0);
     void run();
+    void set_current_scene(QGraphicsScene&);
     void load_file(QStringList &tut_text_ptr);
     void tutorial_part_1(QStringList &tut_text_ptr);
     void tutorial_part_2(QStringList &tut_text_ptr);
@@ -20,6 +22,7 @@ public:
 private:
     int tut_text_position;
     QStringList tut_text_ptr;
+    QGraphicsScene *scene;
 signals:
     void update_story(QString);
     void spawn_tutorial_rects();

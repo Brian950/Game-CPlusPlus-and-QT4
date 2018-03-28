@@ -4,7 +4,7 @@ Container::Container()
 {
 }
 
-Container::Container(int type){
+Container::Container(int type, Character *player){
     this->type = type;
     contents = generate_items();
     if(type == 1)
@@ -14,10 +14,15 @@ Container::Container(int type){
     setScale(0.3);
 }
 
-Container::Container(int type, QString contents)
+Container::Container(int type, Character *player, QString contents)
 {
     this->type = type;
     this->contents = contents;
+}
+
+void Container::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    emit open_inventory();
 }
 
 QString Container::generate_items(){

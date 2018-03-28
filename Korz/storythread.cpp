@@ -19,6 +19,10 @@ void StoryThread::run()
     }
 }
 
+void StoryThread::set_current_scene(QGraphicsScene &scene){
+    this->scene = &scene;
+}
+
 void StoryThread::load_file(QStringList &tut_text_ptr){
     QFile inputFile("/home/brian/Korz/trunk/Korz/tutorial_story.txt");
     QString line;
@@ -50,7 +54,7 @@ void StoryThread::tutorial_part_1(QStringList &tut_text_ptr)
 void StoryThread::tutorial_part_2(QStringList &tut_text_ptr)
 {
     QString line;
-    for(int x = tut_text_position; x < 3; x++){
+    for(int x = tut_text_position; x < 6; x++){
         line = tut_text_ptr.at(x);
         emit update_story(line);
         sleep(3);
