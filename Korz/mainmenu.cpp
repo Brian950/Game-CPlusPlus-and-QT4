@@ -8,6 +8,7 @@ MainMenu::MainMenu(QWidget *parent) :
     ui(new Ui::MainMenu)
 {
     ui->setupUi(this);
+    dbc = new DB_Controller("/home/brian/Korz/trunk/Korz/kroz.db");//Initialises sqlite3 database
     //this->showFullScreen();
 
     QString ability_default="None Selected";
@@ -35,11 +36,6 @@ MainMenu::MainMenu(QWidget *parent) :
 
     tutorial_scene = new QGraphicsScene(this);
     tutorial_scene->setSceneRect(-50, -250, 1000, 600);
-    Container *tut_cont_1 = new Container(1, player);
-    tut_cont_1->setPos(450, 100);
-    connect(tut_cont_1, SIGNAL(open_inventory()), this, SLOT(open_inventory()));
-
-    tutorial_scene->addItem(tut_cont_1);
     tutorial_scene->setFocus();
     ui->game_view->setScene(tutorial_scene);
 }
@@ -183,8 +179,18 @@ void MainMenu::on_finish_button_clicked()
 {
     if(ui->character_progress->value() == 100 && CHARACTER_POINTS == 0){
         player = new Character(CHARACTER_NAME, STR_LAST_VALUE, SPD_LAST_VALUE, GUN_LAST_VALUE, LCK_LAST_VALUE, ui->ability_box->currentIndex());
-        dbc = new DB_Controller("/home/brian/Korz/trunk/Korz/kroz.db");
-        tutorial_part_1();
+        connect(player, SIGNAL(update_health()), this, SLOT(update_health_bar()));
+        int character_id = dbc->number_of_characters()+1;
+        int insert_char_result = dbc->add_player(character_id, player->get_name(), player->get_strength(), player->get_speed(), player->get_guns(), player->get_luck(), player->get_special(), player->get_location(),player->get_health(), player->get_inventory());
+        if(insert_char_result == 1){
+            QMessageBox msgBox;
+            msgBox.setText("This name is already taken.");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.exec();
+        }
+        else{
+            tutorial_part_1();
+        }
     }
     else{
         QMessageBox msgBox;
@@ -218,13 +224,21 @@ void MainMenu::tutorial_part_1()
     tutorial_scene->addItem(player);
     player->set_x_limit(300);
     story_thread = new StoryThread(this);
-    story_thread->set_current_scene(*tutorial_scene);
     connect(story_thread, SIGNAL(update_story(QString)),this, SLOT(update_story(QString)));
     connect(story_thread, SIGNAL(spawn_tutorial_rects()), this, SLOT(spawn_tutorial_rects()));
+    connect(story_thread, SIGNAL(spawn_tutorial_enemy()), this, SLOT(spawn_tutorial_enemy()));
     story_thread->start();
 }
 
 void MainMenu::tutorial_part_2(){
+    Container *tut_cont_1 = new Container(1, player, this);
+    tut_cont_1->setPos(450, 100);
+    tut_cont_1->setZValue(-1);
+    tutorial_scene->addItem(tut_cont_1);
+    story_thread->start();
+}
+
+void MainMenu::tutorial_part_3(){
     story_thread->start();
 }
 
@@ -252,6 +266,10 @@ void MainMenu::spawn_tutorial_rects(){
     connect(rect4, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
 }
 
+void MainMenu::spawn_tutorial_enemy(){
+    qDebug() << "Spawn enemy";
+}
+
 //Once the four tutorial rects are destroyed, then the next task is triggered
 void MainMenu::rectangle_destroyed(){
     tut_rect_counter++;
@@ -269,14 +287,86 @@ void MainMenu::update_story(QString story_text)
 void MainMenu::on_pushButton_3_clicked()
 {
     player = new Character("Brian", 5, 10, 5, 5, 1);
-    dbc = new DB_Controller("/home/brian/Korz/trunk/Korz/kroz.db");
-    dbc->add_player(player->get_name(), player->get_strength(), player->get_speed(), player->get_guns(), player->get_luck(), player->get_special(), player->get_location(),player->get_health(), player->get_inventory());
-    tutorial_part_1();
+    connect(player, SIGNAL(update_health()), this, SLOT(update_health_bar()));
+    dbc->clear_character_table();
+    int character_id = dbc->number_of_characters()+1;
+    int insert_char_result = dbc->add_player(character_id, player->get_name(), player->get_strength(), player->get_speed(), player->get_guns(), player->get_luck(), player->get_special(), player->get_location(),player->get_health(), player->get_inventory());
+    if(insert_char_result == 1){
+        QMessageBox msgBox;
+        msgBox.setText("This name is already taken.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+    }
+    else{
+        tutorial_part_1();
+    }
 }
 
-void MainMenu::open_inventory(){
+void MainMenu::open_inventory(QString container, Container *act_cont){
+    player->setFocus();
     QString inventory = player->get_inventory();
+    active_container = act_cont;
+    ui->stackedWidget->setCurrentIndex(3);
 
+    int item_id;
+    QString item_name;
+    QListWidgetItem *list_item;
+
+    ui->player_inventory->clear();
+    ui->external_inventory->clear();
+    int inv_size = player->get_inventory_size();
+    QString inv_stat("("); inv_stat+=QString::number(inv_size); inv_stat+="/10)";
+    ui->inventory_status_label->setText(inv_stat);
+
+    //populates the player inventory list
+    QStringList inventory_items = inventory.split(":");
+    if(inventory_items.length() > 0 && inventory != ""){
+        for(int x = 0; x < inventory_items.length();x++){
+            item_id = inventory_items.at(x).toInt();
+            item_name = dbc->get_item_name(item_id);
+            list_item = new QListWidgetItem();
+            list_item->setText(item_name);
+            ui->player_inventory->addItem(list_item);
+        }
+    }
+    else if(inventory.length() == 1 && inventory != ""){
+        item_id = inventory.toInt();
+        item_name = dbc->get_item_name(item_id);
+        list_item = new QListWidgetItem();
+        list_item->setText(item_name);
+        ui->player_inventory->addItem(list_item);
+    }
+
+    //populates the container list
+    QStringList container_items = container.split(":");
+    if(container_items.length() > 0 && container != ""){
+        for(int x = 0; x < container_items.length(); x++){
+            item_id = container_items.at(x).toInt();
+            item_name = dbc->get_item_name(item_id);
+            list_item = new QListWidgetItem();
+            list_item->setText(item_name);
+            ui->external_inventory->addItem(list_item);
+        }
+    }
+    else if(container_items.length() == 1 && container != ""){
+        item_id = container.toInt();
+        item_name = dbc->get_item_name(item_id);
+        list_item = new QListWidgetItem();
+        list_item->setText(item_name);
+        ui->external_inventory->addItem(list_item);
+    }
+}
+
+void MainMenu::mousePressEvent(QMouseEvent *event)
+{
+    if(player != NULL){
+        QList<QGraphicsItem*> items = ui->game_view->items();
+        for(int x = 0; x < items.length(); x++){
+            if(items.at(x) == player)
+                player->setFocus();
+        }
+        qDebug() << "mouse pressed";
+    }
 }
 
 void MainMenu::on_north_button_clicked()
@@ -301,15 +391,27 @@ void MainMenu::on_west_button_clicked()
 
 void MainMenu::on_inventory_back_button_clicked()
 {
+    if(tut_cont_first_time && story_thread->part_2_complete == true){
+        tut_cont_first_time = false;
+        tutorial_part_3();
+    }
     ui->stackedWidget->setCurrentIndex(2);
 }
 
 void MainMenu::on_add_to_inventory_button_clicked()
 {
     if(player->get_inventory_size() < 10){
-        QListWidgetItem *item = ui->external_inventory->currentItem();
-        ui->player_inventory->addItem(item);
-        ui->external_inventory->removeItemWidget(item);
+        if(ui->external_inventory->currentItem() != NULL){
+            QListWidgetItem *item = ui->external_inventory->takeItem(ui->external_inventory->currentRow());
+            ui->player_inventory->addItem(item);
+            int item_id = dbc->get_item_id(item->text());
+            qDebug() << "item id to be added:" << item_id;
+            player->add_item_to_inventory(item_id);
+            active_container->remove_item(item_id);
+            QString inv_stat("("); inv_stat+=QString::number(player->get_inventory_size()); inv_stat+="/10)";
+            ui->inventory_status_label->setText(inv_stat);
+            qDebug() << player->get_inventory();
+        }
     }
     else{
         QMessageBox msgBox;
@@ -321,5 +423,141 @@ void MainMenu::on_add_to_inventory_button_clicked()
 
 void MainMenu::on_remove_from_inventory_button_clicked()
 {
+    if(ui->player_inventory->currentItem() != NULL){
+        QListWidgetItem *item = ui->player_inventory->takeItem(ui->player_inventory->currentRow());
+        ui->external_inventory->addItem(item);
 
+        int item_id = dbc->get_item_id(item->text());
+        player->remove_item_from_inventory(item_id);
+        active_container->add_item(item_id);
+        QString inv_stat("("); inv_stat+=QString::number(player->get_inventory_size()); inv_stat+="/10)";
+        ui->inventory_status_label->setText(inv_stat);
+    }
+}
+
+void MainMenu::on_inventory_button_clicked()
+{
+    QString inventory = player->get_inventory();
+    ui->main_inventory->clear();
+    QString item_name;
+    QListWidgetItem *list_item;
+    int item_id;
+    QStringList inventory_items = inventory.split(":");
+    if(inventory_items.length() > 0 && inventory != ""){
+        for(int x = 0; x < inventory_items.length();x++){
+            item_id = inventory_items.at(x).toInt();
+            item_name = dbc->get_item_name(item_id);
+            list_item = new QListWidgetItem();
+            list_item->setText(item_name);
+            ui->main_inventory->addItem(list_item);
+        }
+    }
+    else if(inventory.length() == 1 && inventory != ""){
+        item_id = inventory.toInt();
+        item_name = dbc->get_item_name(item_id);
+        list_item = new QListWidgetItem();
+        list_item->setText(item_name);
+        ui->main_inventory->addItem(list_item);
+    }
+    ui->stackedWidget->setCurrentIndex(4);
+
+}
+
+void MainMenu::on_main_inventory_back_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(2);
+    ui->game_view->setFocus();
+    tutorial_scene->setFocus();
+    player->setFocus();
+}
+
+void MainMenu::on_use_item_button_clicked()
+{
+    if(ui->main_inventory->currentItem() != NULL){
+        QListWidgetItem *item = ui->main_inventory->currentItem();
+        int item_id = dbc->get_item_id(item->text());
+            switch(item_id){
+                case 1:{
+                    Weapon *old_rifle = new Weapon(1, "old rifle", 10, 1);
+                    player->set_current_weapon(old_rifle);
+                    ui->active_weapon_label->setText("Active Weapon\n\nold rifle");
+                    break;
+            }
+            case 2:{
+                Weapon *bolt_rifle = new Weapon(2, "bolt rifle", 50, 1.5);
+                player->set_current_weapon(bolt_rifle);
+                ui->active_weapon_label->setText("Active Weapon\n\nbolt rifle");
+                break;
+            }
+            case 3:{
+                Weapon *assault_rifle = new Weapon(3, "assault rifle", 25, 0.25);
+                player->set_current_weapon(assault_rifle);
+                ui->active_weapon_label->setText("Active Weapon\n\nassault rifle");
+                break;
+            }
+            case 4:{
+                if(player->get_health() != 100){
+                    Medkit *small = new Medkit(4, "small medkit", 25);
+                    player->use_medkit(small);
+                    ui->health_bar->setValue(player->get_health());
+                    ui->health_bar_2->setValue(player->get_health());
+                    QListWidgetItem *item = ui->main_inventory->currentItem();
+                    player->remove_item_from_inventory(4);
+                    delete item;
+                    delete small;
+                }
+                else{
+                    QMessageBox msgBox;
+                    msgBox.setText("Your health is already full!");
+                    msgBox.setStandardButtons(QMessageBox::Ok);
+                    msgBox.exec();
+                }
+                break;
+            }
+            case 5:{
+                if(player->get_health() != 100){
+                    Medkit *medium = new Medkit(5, "medium medkit", 50);
+                    player->use_medkit(medium);
+                    ui->health_bar->setValue(player->get_health());
+                    ui->health_bar_2->setValue(player->get_health());
+                    QListWidgetItem *item = ui->main_inventory->currentItem();
+                    player->remove_item_from_inventory(5);
+                    delete item;
+                    delete medium;
+                }
+                else{
+                    QMessageBox msgBox;
+                    msgBox.setText("Your health is already full!");
+                    msgBox.setStandardButtons(QMessageBox::Ok);
+                    msgBox.exec();
+                }
+                break;
+            }
+            case 6:{
+                if(player->get_health() != 100){
+                    Medkit *full = new Medkit(6, "full medkit", 100);
+                    player->use_medkit(full);
+                    ui->health_bar->setValue(player->get_health());
+                    ui->health_bar_2->setValue(player->get_health());
+                    player->remove_item_from_inventory(6);
+                    QListWidgetItem *item = ui->main_inventory->currentItem();
+                    delete item;
+                    delete full;
+                }
+                else{
+                    QMessageBox msgBox;
+                    msgBox.setText("Your health is already full!");
+                    msgBox.setStandardButtons(QMessageBox::Ok);
+                    msgBox.exec();
+                }
+                break;
+            }
+        }
+    }
+}
+
+void MainMenu::update_health_bar()
+{
+    ui->health_bar->setValue(player->get_health());
+    ui->health_bar_2->setValue(player->get_health());
 }

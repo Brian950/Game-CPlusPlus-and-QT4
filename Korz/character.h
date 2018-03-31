@@ -5,11 +5,14 @@
 #include <QKeyEvent>
 #include <QGraphicsItem>
 #include <QGraphicsPixmapItem>
+#include "weapon.h"
+#include "medkit.h"
 
 using namespace std;
 
-class Character : public QGraphicsPixmapItem
+class Character : public QObject, public QGraphicsPixmapItem
 {
+    Q_OBJECT
 private:
     QString name;
     int strength;
@@ -18,9 +21,10 @@ private:
     int luck;
     int special_ability;
     int location;
+    int direction; //0 = left  1 = right
     int health;
+    Weapon *current_weapon;
     QString inventory_string; //String of item ids separated by ':' to store inventory.
-    bool moveable;
     int x_limit; //Sets limit on where on the screen the player can move to
 
 public:
@@ -49,10 +53,19 @@ public:
     void set_health(int);
     int get_x_limit();
     void set_x_limit(int);
+    int get_direction();
     QString get_inventory();
     int add_item_to_inventory(int);
     void set_inventory(QString);
     int get_inventory_size();
+    void remove_item_from_inventory(int id);
+    void set_current_weapon(Weapon*);
+    Weapon* get_current_weapon();
+    void use_medkit(Medkit*);
+    void hit(int dam);
+    void die();
+signals:
+    void update_health();
 };
 
 #endif // CHARACTER_H

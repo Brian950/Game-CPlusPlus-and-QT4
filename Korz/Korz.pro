@@ -34,7 +34,9 @@ SOURCES += \
     container.cpp \
     storythread.cpp \
     weapon.cpp \
-    medkit.cpp
+    medkit.cpp \
+    enemy.cpp \
+    bullet.cpp
 
 HEADERS += \
         mainmenu.h \
@@ -45,7 +47,9 @@ HEADERS += \
     container.h \
     storythread.h \
     weapon.h \
-    medkit.h
+    medkit.h \
+    enemy.h \
+    bullet.h
 
 FORMS += \
     mainmenu.ui

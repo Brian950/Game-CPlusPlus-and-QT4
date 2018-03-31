@@ -15,6 +15,8 @@
 #include <QDesktopWidget>
 #include "container.h"
 #include "playercollisionsthread.h"
+#include "weapon.h"
+#include "medkit.h"
 
 namespace Ui {
 class MainMenu;
@@ -33,8 +35,10 @@ public slots:
     void spawn_tutorial_rects();
     void tutorial_part_2();
     void rectangle_destroyed();
-    void open_inventory();
-
+    void open_inventory(QString, Container*);
+    void spawn_tutorial_enemy();
+protected:
+    void mousePressEvent(QMouseEvent *event);
 private slots:
     void on_pushButton_clicked();
     void on_back_button_1_clicked();
@@ -49,6 +53,7 @@ private slots:
     void on_reset_button_clicked();
     void on_ability_box_currentIndexChanged(int index);
     void tutorial_part_1();
+    void tutorial_part_3();
     void on_pushButton_3_clicked();
     void on_north_button_clicked();
     void on_south_button_clicked();
@@ -57,14 +62,19 @@ private slots:
     void on_inventory_back_button_clicked();
     void on_add_to_inventory_button_clicked();
     void on_remove_from_inventory_button_clicked();
+    void on_inventory_button_clicked();
+    void on_main_inventory_back_clicked();
+    void on_use_item_button_clicked();
+    void update_health_bar();
 
 private:
     Ui::MainMenu *ui;
     DB_Controller *dbc;
-    Character *player;
+    Character *player = NULL;
     StoryThread *story_thread;
     QGraphicsScene *tutorial_scene;
     QSet<int> pressedKeys; //Holds all currently held down keys
+    Container *active_container;
 
     int CHARACTER_POINTS = 20;
     int STR_LAST_VALUE = 0, SPD_LAST_VALUE = 0, GUN_LAST_VALUE = 0, LCK_LAST_VALUE = 0;
@@ -77,6 +87,7 @@ private:
     CustomRect *rect3;
     CustomRect *rect4;
     int tut_rect_counter = 0;
+    bool tut_cont_first_time = true;
 };
 
 #endif // MAINMENU_H

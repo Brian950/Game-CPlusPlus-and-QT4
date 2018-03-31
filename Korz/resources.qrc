@@ -9,5 +9,7 @@
         <file>Rooms/tutorial_room.png</file>
         <file>Icons/soldier.png</file>
         <file>Icons/soldier-left.png</file>
+        <file>Icons/bullet.png</file>
+        <file>Icons/bullet_left.png</file>
     </qresource>
 </RCC>

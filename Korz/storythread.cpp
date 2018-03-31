@@ -6,6 +6,7 @@ StoryThread::StoryThread(QObject *parent) : QThread(parent)
     tut_text_position = 0;
     part_1_complete = false;
     part_2_complete = false;
+    part_3_complete = false;
 }
 
 void StoryThread::run()
@@ -17,10 +18,9 @@ void StoryThread::run()
     else if(part_2_complete == false){
         tutorial_part_2(tut_text_ptr);
     }
-}
-
-void StoryThread::set_current_scene(QGraphicsScene &scene){
-    this->scene = &scene;
+    else if(part_3_complete == false){
+        tutorial_part_3(tut_text_ptr);
+    }
 }
 
 void StoryThread::load_file(QStringList &tut_text_ptr){
@@ -57,9 +57,21 @@ void StoryThread::tutorial_part_2(QStringList &tut_text_ptr)
     for(int x = tut_text_position; x < 6; x++){
         line = tut_text_ptr.at(x);
         emit update_story(line);
-        sleep(3);
+        sleep(2);
         tut_text_position = x;
     }
     part_2_complete = true;
 }
 
+void StoryThread::tutorial_part_3(QStringList &tut_text_ptr)
+{
+    QString line;
+    for(int x = tut_text_position; x < 9; x++){
+        line = tut_text_ptr.at(x);
+        emit update_story(line);
+        sleep(2);
+        tut_text_position = x;
+    }
+    emit spawn_tutorial_enemy();
+    part_3_complete = true;
+}
