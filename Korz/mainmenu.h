@@ -17,6 +17,7 @@
 #include "playercollisionsthread.h"
 #include "weapon.h"
 #include "medkit.h"
+#include "enemy.h"
 
 namespace Ui {
 class MainMenu;
@@ -54,6 +55,7 @@ private slots:
     void on_ability_box_currentIndexChanged(int index);
     void tutorial_part_1();
     void tutorial_part_3();
+    void tutorial_part_4();
     void on_pushButton_3_clicked();
     void on_north_button_clicked();
     void on_south_button_clicked();
@@ -66,6 +68,8 @@ private slots:
     void on_main_inventory_back_clicked();
     void on_use_item_button_clicked();
     void update_health_bar();
+    void on_tutorial_enemy_dead();
+    void spawn_enemy(int, QPoint);
 
 private:
     Ui::MainMenu *ui;
@@ -88,6 +92,7 @@ private:
     CustomRect *rect4;
     int tut_rect_counter = 0;
     bool tut_cont_first_time = true;
+    QList<Enemy*> *active_enemy_list;
 };
 
 #endif // MAINMENU_H

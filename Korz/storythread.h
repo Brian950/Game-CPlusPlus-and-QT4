@@ -15,6 +15,7 @@ public:
     bool part_1_complete;
     bool part_2_complete;
     bool part_3_complete;
+    bool part_4_complete;
 private:
     int tut_text_position;
     QStringList tut_text_ptr;
@@ -22,6 +23,7 @@ private:
     void tutorial_part_1(QStringList &tut_text_ptr);
     void tutorial_part_2(QStringList &tut_text_ptr);
     void tutorial_part_3(QStringList &tut_text_ptr);
+    void tutorial_part_4(QStringList &tut_text_ptr);
 signals:
     void update_story(QString);
     void spawn_tutorial_rects();

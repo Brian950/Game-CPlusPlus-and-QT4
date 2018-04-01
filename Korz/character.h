@@ -7,6 +7,7 @@
 #include <QGraphicsPixmapItem>
 #include "weapon.h"
 #include "medkit.h"
+class Enemy;
 
 using namespace std;
 
@@ -23,13 +24,15 @@ private:
     int location;
     int direction; //0 = left  1 = right
     int health;
+    int max_health;
     Weapon *current_weapon;
     QString inventory_string; //String of item ids separated by ':' to store inventory.
     int x_limit; //Sets limit on where on the screen the player can move to
+    QList<Enemy*> *active_enemies;
 
 public:
     Character();
-    Character(QString, int, int, int, int, int);
+    Character(QString, int, int, int, int, int, QList<Enemy*>*);
     QPixmap right_pixmap;
     QPixmap left_pixmap;
     QString get_name();

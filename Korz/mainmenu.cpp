@@ -34,6 +34,7 @@ MainMenu::MainMenu(QWidget *parent) :
     //Progress bar updates
     connect(ui->name_edit, SIGNAL(editingFinished()), this, SLOT(update_progress(int)));
 
+    active_enemy_list = new QList<Enemy*>();
     tutorial_scene = new QGraphicsScene(this);
     tutorial_scene->setSceneRect(-50, -250, 1000, 600);
     tutorial_scene->setFocus();
@@ -178,7 +179,7 @@ void MainMenu::on_ability_box_currentIndexChanged(int index)
 void MainMenu::on_finish_button_clicked()
 {
     if(ui->character_progress->value() == 100 && CHARACTER_POINTS == 0){
-        player = new Character(CHARACTER_NAME, STR_LAST_VALUE, SPD_LAST_VALUE, GUN_LAST_VALUE, LCK_LAST_VALUE, ui->ability_box->currentIndex());
+        player = new Character(CHARACTER_NAME, STR_LAST_VALUE, SPD_LAST_VALUE, GUN_LAST_VALUE, LCK_LAST_VALUE, ui->ability_box->currentIndex(), active_enemy_list);
         connect(player, SIGNAL(update_health()), this, SLOT(update_health_bar()));
         int character_id = dbc->number_of_characters()+1;
         int insert_char_result = dbc->add_player(character_id, player->get_name(), player->get_strength(), player->get_speed(), player->get_guns(), player->get_luck(), player->get_special(), player->get_location(),player->get_health(), player->get_inventory());
@@ -216,69 +217,6 @@ void MainMenu::on_reset_button_clicked()
     ui->ability_box->setCurrentIndex(0);
 }
 
-void MainMenu::tutorial_part_1()
-{
-    ui->stackedWidget->setCurrentIndex(2);
-    player->setFocus();
-    player->setPos(50, 0);
-    tutorial_scene->addItem(player);
-    player->set_x_limit(300);
-    story_thread = new StoryThread(this);
-    connect(story_thread, SIGNAL(update_story(QString)),this, SLOT(update_story(QString)));
-    connect(story_thread, SIGNAL(spawn_tutorial_rects()), this, SLOT(spawn_tutorial_rects()));
-    connect(story_thread, SIGNAL(spawn_tutorial_enemy()), this, SLOT(spawn_tutorial_enemy()));
-    story_thread->start();
-}
-
-void MainMenu::tutorial_part_2(){
-    Container *tut_cont_1 = new Container(1, player, this);
-    tut_cont_1->setPos(450, 100);
-    tut_cont_1->setZValue(-1);
-    tutorial_scene->addItem(tut_cont_1);
-    story_thread->start();
-}
-
-void MainMenu::tutorial_part_3(){
-    story_thread->start();
-}
-
-void MainMenu::spawn_tutorial_rects(){
-    rect1 = new CustomRect(player);
-    rect1->setPos(40, -120);
-    rect1->setZValue(-1);
-    tutorial_scene->addItem(rect1);
-    rect2 = new CustomRect(player);
-    rect2->setPos(40, 200);
-    rect2->setZValue(-1);
-    tutorial_scene->addItem(rect2);
-    rect3 = new CustomRect(player);
-    rect3->setPos(200, -120);
-    rect3->setZValue(-1);
-    tutorial_scene->addItem(rect3);
-    rect4 = new CustomRect(player);
-    rect4->setPos(200,200);
-    rect4->setZValue(-1);
-    tutorial_scene->addItem(rect4);
-    //Rectangles for tutorial first task
-    connect(rect1, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
-    connect(rect2, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
-    connect(rect3, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
-    connect(rect4, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
-}
-
-void MainMenu::spawn_tutorial_enemy(){
-    qDebug() << "Spawn enemy";
-}
-
-//Once the four tutorial rects are destroyed, then the next task is triggered
-void MainMenu::rectangle_destroyed(){
-    tut_rect_counter++;
-    if(tut_rect_counter == 4){
-        player->set_x_limit(500);
-        tutorial_part_2();
-    }
-}
-
 void MainMenu::update_story(QString story_text)
 {
     ui->story_label->setText(story_text);
@@ -286,7 +224,7 @@ void MainMenu::update_story(QString story_text)
 
 void MainMenu::on_pushButton_3_clicked()
 {
-    player = new Character("Brian", 5, 10, 5, 5, 1);
+    player = new Character("Brian", 5, 10, 5, 5, 1, active_enemy_list);
     connect(player, SIGNAL(update_health()), this, SLOT(update_health_bar()));
     dbc->clear_character_table();
     int character_id = dbc->number_of_characters()+1;
@@ -365,7 +303,6 @@ void MainMenu::mousePressEvent(QMouseEvent *event)
             if(items.at(x) == player)
                 player->setFocus();
         }
-        qDebug() << "mouse pressed";
     }
 }
 
@@ -405,12 +342,10 @@ void MainMenu::on_add_to_inventory_button_clicked()
             QListWidgetItem *item = ui->external_inventory->takeItem(ui->external_inventory->currentRow());
             ui->player_inventory->addItem(item);
             int item_id = dbc->get_item_id(item->text());
-            qDebug() << "item id to be added:" << item_id;
             player->add_item_to_inventory(item_id);
             active_container->remove_item(item_id);
             QString inv_stat("("); inv_stat+=QString::number(player->get_inventory_size()); inv_stat+="/10)";
             ui->inventory_status_label->setText(inv_stat);
-            qDebug() << player->get_inventory();
         }
     }
     else{
@@ -560,4 +495,89 @@ void MainMenu::update_health_bar()
 {
     ui->health_bar->setValue(player->get_health());
     ui->health_bar_2->setValue(player->get_health());
+}
+
+
+//-----MISSION RELATED-----
+
+void MainMenu::tutorial_part_1()
+{
+    ui->stackedWidget->setCurrentIndex(2);
+    player->setFocus();
+    player->setPos(50, 0);
+    tutorial_scene->addItem(player);
+    player->set_x_limit(300);
+    story_thread = new StoryThread(this);
+    connect(story_thread, SIGNAL(update_story(QString)),this, SLOT(update_story(QString)));
+    connect(story_thread, SIGNAL(spawn_tutorial_rects()), this, SLOT(spawn_tutorial_rects()));
+    connect(story_thread, SIGNAL(spawn_tutorial_enemy()), this, SLOT(spawn_tutorial_enemy()));
+    story_thread->start();
+}
+
+void MainMenu::tutorial_part_2(){
+    Container *tut_cont_1 = new Container(1, player, this);
+    tut_cont_1->setPos(450, 100);
+    tut_cont_1->setZValue(-1);
+    tutorial_scene->addItem(tut_cont_1);
+    story_thread->start();
+}
+
+void MainMenu::tutorial_part_3(){
+    story_thread->start();
+}
+
+void MainMenu::tutorial_part_4(){
+    story_thread->start();
+}
+
+void MainMenu::spawn_tutorial_rects(){
+    rect1 = new CustomRect(player);
+    rect1->setPos(40, -120);
+    rect1->setZValue(-1);
+    tutorial_scene->addItem(rect1);
+    rect2 = new CustomRect(player);
+    rect2->setPos(40, 200);
+    rect2->setZValue(-1);
+    tutorial_scene->addItem(rect2);
+    rect3 = new CustomRect(player);
+    rect3->setPos(200, -120);
+    rect3->setZValue(-1);
+    tutorial_scene->addItem(rect3);
+    rect4 = new CustomRect(player);
+    rect4->setPos(200,200);
+    rect4->setZValue(-1);
+    tutorial_scene->addItem(rect4);
+    //Rectangles for tutorial first task
+    connect(rect1, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
+    connect(rect2, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
+    connect(rect3, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
+    connect(rect4, SIGNAL(destroyed()), this, SLOT(rectangle_destroyed()));
+}
+
+//Once the four tutorial rects are destroyed, then the next task is triggered
+void MainMenu::rectangle_destroyed(){
+    tut_rect_counter++;
+    if(tut_rect_counter == 4){
+        player->set_x_limit(500);
+        tutorial_part_2();
+    }
+}
+
+void MainMenu::spawn_tutorial_enemy(){
+    player->set_x_limit(900);
+    QPoint enemy_pos = QPoint(920, 10);
+    spawn_enemy(1, enemy_pos);
+}
+
+void MainMenu::spawn_enemy(int type, QPoint position){
+    QPoint pos2 = QPoint(920, 200);
+    Enemy *enemy = new Enemy(type, player, position);
+    tutorial_scene->addItem(enemy);
+    active_enemy_list->append(enemy);
+    connect(enemy, SIGNAL(dead()), this, SLOT(on_tutorial_enemy_dead()));
+}
+
+void MainMenu::on_tutorial_enemy_dead()
+{
+    tutorial_part_4();
 }

@@ -2,11 +2,12 @@
 #include "bullet.h"
 #include <QDebug>
 
+
 Character::Character()
 {
 }
 
-Character::Character(QString n, int str, int spd, int gn, int lk, int spc)
+Character::Character(QString n, int str, int spd, int gn, int lk, int spc, QList<Enemy*> *enemies)
 {
     name = n;
     strength = str;
@@ -15,11 +16,13 @@ Character::Character(QString n, int str, int spd, int gn, int lk, int spc)
     luck = lk;
     special_ability = spc;
     location = 0;
-    health = 100;
+    max_health = 100+(str*3);
+    health = max_health;
     direction = 1;
     inventory_string = "1:4";
     right_pixmap = QPixmap(":/Icons/soldier.png");
     left_pixmap = QPixmap(":/Icons/soldier-left.png");
+    active_enemies = enemies;
     x_limit = 850;
     set_current_weapon(new Weapon(0, "default", 10, 3));
     setFlag(QGraphicsItem::ItemIsFocusable);
@@ -33,7 +36,7 @@ void Character::keyPressEvent(QKeyEvent *event)
     if(pressedKeys.contains(Qt::Key_Space)){
         if(current_weapon->can_fire()){
             current_weapon->fire();
-            Bullet *bullet = new Bullet(this);
+            Bullet *bullet = new Bullet(this, active_enemies);
             scene()->addItem(bullet);
         }
     }
@@ -331,8 +334,8 @@ Weapon* Character::get_current_weapon()
 
 void Character::use_medkit(Medkit *m){
     int hp = m->get_health();
-    if(get_health() + hp > 100){
-        set_health(100);
+    if(get_health() + hp > max_health){
+        set_health(max_health);
     }
     else{
         set_health(get_health()+hp);
@@ -342,6 +345,8 @@ void Character::use_medkit(Medkit *m){
 void Character::hit(int dam)
 {
     if(health - dam < 1){
+        health = 0;
+        emit update_health();
         die();
     }
     else{

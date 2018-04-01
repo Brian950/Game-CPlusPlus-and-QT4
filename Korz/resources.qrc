@@ -11,5 +11,11 @@
         <file>Icons/soldier-left.png</file>
         <file>Icons/bullet.png</file>
         <file>Icons/bullet_left.png</file>
+        <file>Icons/enemy_bullet.png</file>
+        <file>Icons/enemy_bullet_left.png</file>
+        <file>Icons/enemy_left.png</file>
+        <file>Icons/enemy.png</file>
+        <file>Icons/enemy_left_dead.png</file>
+        <file>Icons/enemy_right_dead.png</file>
     </qresource>
 </RCC>

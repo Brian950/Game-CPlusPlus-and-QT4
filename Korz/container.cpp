@@ -35,7 +35,7 @@ QString Container::generate_items(){
     QString item_list = "";
 
     srand(time(0)); //sets seed for rand
-    int rand_num_of_items = rand() % 3 + 1;
+    int rand_num_of_items = rand() % 2 + 1;
     int rand_item_range;
     for(int x = 0; x < rand_num_of_items; x++){
         rand_item_range = rand() % 100 + 1;

@@ -3,13 +3,14 @@
 #include <QPixmap>
 #include <QGraphicsItem>
 #include <QTimer>
-#include "character.h"
+class Character;
 
-class Enemy : public QGraphicsPixmapItem
+class Enemy : public QObject, public QGraphicsPixmapItem
 {
+    Q_OBJECT
 public:
     Enemy();
-    Enemy(int t, Character *player);
+    Enemy(int t, Character *play, QPoint position);
     void hit(int dam);
     int get_damage();
     int get_direction();
@@ -23,12 +24,19 @@ private:
     int fire_rate;
     int speed;
     int aggro;//How close the enemy wants to get to the player
-    QPixmap pixmap;
-    QTimer movement;
-    QTimer shooting;
+    QPixmap pixmap_left;
+    QPixmap pixmap_right;
+    QPixmap pixmap_dead_left;
+    QPixmap pixmap_dead_right;
+    QTimer *movement;
+    QTimer *shooting;
+    Character *player;
+    void die();
+private slots:
     void move();
     void shoot();
-    void die();
+signals:
+    void dead();
 
 };
 
