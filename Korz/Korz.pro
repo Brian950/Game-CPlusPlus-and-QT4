@@ -6,7 +6,7 @@
 
 QT       += core gui
 QT       += sql
-
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Korz
@@ -61,4 +61,5 @@ DISTFILES += \
     Icons/gun_icon.png \
     Icons/fire_icon.svg \
     Rooms/tutorial_room.png \
-    Icons/soldier.png
+    Icons/soldier.png \
+    Sounds/gun_shot.wav

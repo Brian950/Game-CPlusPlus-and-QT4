@@ -180,6 +180,10 @@ void MainMenu::on_finish_button_clicked()
 {
     if(ui->character_progress->value() == 100 && CHARACTER_POINTS == 0){
         player = new Character(CHARACTER_NAME, STR_LAST_VALUE, SPD_LAST_VALUE, GUN_LAST_VALUE, LCK_LAST_VALUE, ui->ability_box->currentIndex(), active_enemy_list);
+        ui->health_bar->setMaximum(player->get_health());
+        ui->health_bar_2->setMaximum(player->get_health());
+        ui->health_bar->setValue(player->get_health());
+        ui->health_bar_2->setValue(player->get_health());
         connect(player, SIGNAL(update_health()), this, SLOT(update_health_bar()));
         int character_id = dbc->number_of_characters()+1;
         int insert_char_result = dbc->add_player(character_id, player->get_name(), player->get_strength(), player->get_speed(), player->get_guns(), player->get_luck(), player->get_special(), player->get_location(),player->get_health(), player->get_inventory());
@@ -225,6 +229,10 @@ void MainMenu::update_story(QString story_text)
 void MainMenu::on_pushButton_3_clicked()
 {
     player = new Character("Brian", 5, 10, 5, 5, 1, active_enemy_list);
+    ui->health_bar->setMaximum(player->get_health());
+    ui->health_bar_2->setMaximum(player->get_health());
+    ui->health_bar->setValue(player->get_health());
+    ui->health_bar_2->setValue(player->get_health());
     connect(player, SIGNAL(update_health()), this, SLOT(update_health_bar()));
     dbc->clear_character_table();
     int character_id = dbc->number_of_characters()+1;
@@ -304,26 +312,6 @@ void MainMenu::mousePressEvent(QMouseEvent *event)
                 player->setFocus();
         }
     }
-}
-
-void MainMenu::on_north_button_clicked()
-{
-
-}
-
-void MainMenu::on_south_button_clicked()
-{
-
-}
-
-void MainMenu::on_east_button_clicked()
-{
-
-}
-
-void MainMenu::on_west_button_clicked()
-{
-
 }
 
 void MainMenu::on_inventory_back_button_clicked()
@@ -415,23 +403,23 @@ void MainMenu::on_use_item_button_clicked()
                 case 1:{
                     Weapon *old_rifle = new Weapon(1, "old rifle", 10, 1);
                     player->set_current_weapon(old_rifle);
-                    ui->active_weapon_label->setText("Active Weapon\n\nold rifle");
+                    ui->active_weapon_label->setText("Active Weapon\n-------------------------\nOld Rifle\n\nDamage: 10");
                     break;
             }
             case 2:{
                 Weapon *bolt_rifle = new Weapon(2, "bolt rifle", 50, 1.5);
                 player->set_current_weapon(bolt_rifle);
-                ui->active_weapon_label->setText("Active Weapon\n\nbolt rifle");
+                ui->active_weapon_label->setText("Active Weapon\n-------------------------\nBolt Rifle\n\nDamage: 50");
                 break;
             }
             case 3:{
-                Weapon *assault_rifle = new Weapon(3, "assault rifle", 25, 0.25);
+                Weapon *assault_rifle = new Weapon(3, "assault rifle", 25, 0.5);
                 player->set_current_weapon(assault_rifle);
-                ui->active_weapon_label->setText("Active Weapon\n\nassault rifle");
+                ui->active_weapon_label->setText("Active Weapon\n-------------------------\nAssault Rifle\n\nDamage: 25");
                 break;
             }
             case 4:{
-                if(player->get_health() != 100){
+                if(player->get_health() != player->get_max_health()){
                     Medkit *small = new Medkit(4, "small medkit", 25);
                     player->use_medkit(small);
                     ui->health_bar->setValue(player->get_health());
@@ -450,7 +438,7 @@ void MainMenu::on_use_item_button_clicked()
                 break;
             }
             case 5:{
-                if(player->get_health() != 100){
+                if(player->get_health() != player->get_max_health()){
                     Medkit *medium = new Medkit(5, "medium medkit", 50);
                     player->use_medkit(medium);
                     ui->health_bar->setValue(player->get_health());
@@ -469,8 +457,8 @@ void MainMenu::on_use_item_button_clicked()
                 break;
             }
             case 6:{
-                if(player->get_health() != 100){
-                    Medkit *full = new Medkit(6, "full medkit", 100);
+                if(player->get_health() != player->get_max_health()){
+                    Medkit *full = new Medkit(6, "full medkit", player->get_max_health());
                     player->use_medkit(full);
                     ui->health_bar->setValue(player->get_health());
                     ui->health_bar_2->setValue(player->get_health());
@@ -511,11 +499,12 @@ void MainMenu::tutorial_part_1()
     connect(story_thread, SIGNAL(update_story(QString)),this, SLOT(update_story(QString)));
     connect(story_thread, SIGNAL(spawn_tutorial_rects()), this, SLOT(spawn_tutorial_rects()));
     connect(story_thread, SIGNAL(spawn_tutorial_enemy()), this, SLOT(spawn_tutorial_enemy()));
+    connect(story_thread, SIGNAL(start_fight()), this, SLOT(start_fight()));
     story_thread->start();
 }
 
 void MainMenu::tutorial_part_2(){
-    Container *tut_cont_1 = new Container(1, player, this);
+    Container *tut_cont_1 = new Container(1, this);
     tut_cont_1->setPos(450, 100);
     tut_cont_1->setZValue(-1);
     tutorial_scene->addItem(tut_cont_1);
@@ -527,6 +516,18 @@ void MainMenu::tutorial_part_3(){
 }
 
 void MainMenu::tutorial_part_4(){
+    story_thread->start();
+}
+
+void MainMenu::tutorial_part_5(){
+    story_thread->start();
+}
+
+void MainMenu::tutorial_part_6(){
+    story_thread->start();
+}
+
+void MainMenu::tutorial_part_7(){
     story_thread->start();
 }
 
@@ -565,12 +566,11 @@ void MainMenu::rectangle_destroyed(){
 
 void MainMenu::spawn_tutorial_enemy(){
     player->set_x_limit(900);
-    QPoint enemy_pos = QPoint(920, 10);
+    QPoint enemy_pos = QPoint(920, 0);
     spawn_enemy(1, enemy_pos);
 }
 
 void MainMenu::spawn_enemy(int type, QPoint position){
-    QPoint pos2 = QPoint(920, 200);
     Enemy *enemy = new Enemy(type, player, position);
     tutorial_scene->addItem(enemy);
     active_enemy_list->append(enemy);
@@ -579,5 +579,130 @@ void MainMenu::spawn_enemy(int type, QPoint position){
 
 void MainMenu::on_tutorial_enemy_dead()
 {
-    tutorial_part_4();
+    if(!story_thread->part_4_complete)
+        tutorial_part_4();
+}
+
+void MainMenu::start_fight(){
+    Enemy *enemy1 = new Enemy(1, player, right_middle);
+    //
+    Enemy *enemy2 = new Enemy(2, player, right_top);
+    Enemy *enemy3 = new Enemy(3, player, right_bottom);
+    room_2_scene->addItem(enemy1);
+    active_enemy_list->append(enemy1);
+    room_2_scene->addItem(enemy2);
+    active_enemy_list->append(enemy2);
+    room_2_scene->addItem(enemy3);
+    active_enemy_list->append(enemy3);
+    connect(enemy1, SIGNAL(dead()), this, SLOT(fight_enemy_dead()));
+    connect(enemy2, SIGNAL(dead()), this, SLOT(fight_enemy_dead()));
+    connect(enemy3, SIGNAL(dead()), this, SLOT(fight_enemy_dead()));
+}
+
+void MainMenu::fight_enemy_dead(){
+    fight_enemy_dead_counter++;
+    if(fight_enemy_dead_counter == 3){
+        Enemy *enemy = new Enemy(1, player, left_top);
+        room_2_scene->addItem(enemy);
+        active_enemy_list->append(enemy);
+        connect(enemy, SIGNAL(dead()), this, SLOT(fight_enemy_dead()));
+    }
+    else if(fight_enemy_dead_counter == 4){
+        tutorial_part_7();
+    }
+}
+
+
+
+//Room setup
+void MainMenu::room_1_setup(){
+    room_1_scene = new QGraphicsScene(this);
+    room_1_scene->setSceneRect(-50, -250, 1000, 600);
+    room_1_scene->addItem(player);
+    player->setPos(50, 0);
+    Container *wooden_box1 = new Container(1, this, 4895);
+    Container *wooden_box2 = new Container(1, this, 9987);
+    Container *wooden_box3 = new Container(1, this, 1564);
+    wooden_box1->setPos(600, 0);
+    wooden_box2->setPos(100, 100);
+    wooden_box3->setPos(800, -100);
+    wooden_box1->setZValue(-1);
+    wooden_box2->setZValue(-1);
+    wooden_box3->setZValue(-1);
+    room_1_scene->addItem(wooden_box1);
+    room_1_scene->addItem(wooden_box2);
+    room_1_scene->addItem(wooden_box3);
+    ui->game_view->setFocus();
+    room_1_scene->setFocus();
+    player->setFocus();
+    ui->game_view->setStyleSheet("border-Image:url(:/Rooms/room_1.png);");
+}
+
+void MainMenu::room_2_setup()
+{
+    room_2_scene = new QGraphicsScene(this);
+    room_2_scene->setSceneRect(-50, -250, 1000, 600);
+    room_2_scene->addItem(player);
+    player->setPos(50, 0);
+    Container *metal_box1 = new Container(2, this, 4895);
+    Container *metal_box2 = new Container(2, this, 9987);
+    Container *metal_box3 = new Container(2, this, 1564);
+    Container *wooden_box1 = new Container(1, this, 9995);
+    metal_box1->setPos(300, 100);
+    metal_box2->setPos(800, 0);
+    metal_box3->setPos(100, 50);
+    wooden_box1->setPos(550, -100);
+    metal_box1->setZValue(-1);
+    metal_box2->setZValue(-1);
+    metal_box3->setZValue(-1);
+    wooden_box1->setZValue(-1);
+    room_2_scene->addItem(metal_box1);
+    room_2_scene->addItem(metal_box2);
+    room_2_scene->addItem(metal_box3);
+    room_2_scene->addItem(wooden_box1);
+    ui->game_view->setFocus();
+    room_1_scene->setFocus();
+    player->setFocus();
+    ui->game_view->setStyleSheet("border-Image:url(:/Rooms/room_2.png);");
+}
+
+//Directional Buttons
+void MainMenu::on_north_button_clicked()
+{
+
+}
+
+void MainMenu::on_south_button_clicked()
+{
+
+}
+
+void MainMenu::on_east_button_clicked()
+{
+    if(!story_thread->part_5_complete){
+        if(story_thread->part_4_complete){
+            tutorial_scene->removeItem(player);
+            room_1_setup();
+            ui->game_view->setScene(room_1_scene);
+            tutorial_part_5();
+        }
+        else{
+            QMessageBox msgBox;
+            msgBox.setText("You must complete the tutorial before leaving!");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.exec();
+        }
+    }
+    else if(story_thread->part_5_complete && !story_thread->part_6_complete){
+        room_1_scene->removeItem(player);
+        room_2_setup();
+        ui->game_view->setScene(room_2_scene);
+        tutorial_part_6();
+    }
+
+}
+
+void MainMenu::on_west_button_clicked()
+{
+
 }

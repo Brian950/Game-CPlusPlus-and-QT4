@@ -59,7 +59,7 @@
        <string notr="true">background-color:#292d33;</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="start">
        <property name="sizePolicy">
@@ -513,6 +513,22 @@ border-width:2px;</string>
           </property>
          </widget>
         </item>
+        <item row="11" column="5">
+         <widget class="QLabel" name="luck_label">
+          <property name="font">
+           <font>
+            <family>Symbola</family>
+            <pointsize>14</pointsize>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color:white;</string>
+          </property>
+          <property name="text">
+           <string>Luck:</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="4" colspan="3">
          <widget class="QLineEdit" name="name_edit">
           <property name="font">
@@ -540,22 +556,6 @@ border-width:2px;</string>
            </size>
           </property>
          </spacer>
-        </item>
-        <item row="11" column="5">
-         <widget class="QLabel" name="luck_label">
-          <property name="font">
-           <font>
-            <family>Symbola</family>
-            <pointsize>14</pointsize>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">color:white;</string>
-          </property>
-          <property name="text">
-           <string>Luck:</string>
-          </property>
-         </widget>
         </item>
         <item row="7" column="5">
          <widget class="QLabel" name="speed_label">
@@ -807,6 +807,19 @@ border-width:2px;</string>
           </property>
          </spacer>
         </item>
+        <item row="4" column="5" colspan="3">
+         <widget class="Line" name="line_8">
+          <property name="maximumSize">
+           <size>
+            <width>180</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
         <item row="3" column="6">
          <widget class="QLabel" name="points_label">
           <property name="maximumSize">
@@ -856,16 +869,10 @@ border-width:2px;</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="5" colspan="3">
-         <widget class="Line" name="line_8">
-          <property name="maximumSize">
-           <size>
-            <width>180</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+        <item row="17" column="4">
+         <widget class="QPushButton" name="pushButton_4">
+          <property name="text">
+           <string>PushButton</string>
           </property>
          </widget>
         </item>
@@ -894,6 +901,9 @@ border-width:2px;</string>
 QProgressBar::chunk {
 	background-color: green;
  }</string>
+          </property>
+          <property name="maximum">
+           <number>100</number>
           </property>
           <property name="value">
            <number>100</number>

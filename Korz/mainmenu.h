@@ -30,7 +30,7 @@ class MainMenu : public QMainWindow
 public:
     explicit MainMenu(QWidget *parent = 0);
     ~MainMenu();
-//Function prototype examples:
+    //Function prototype examples:
 public slots:
     void update_story(QString story_text);
     void spawn_tutorial_rects();
@@ -38,6 +38,7 @@ public slots:
     void rectangle_destroyed();
     void open_inventory(QString, Container*);
     void spawn_tutorial_enemy();
+    void start_fight();
 protected:
     void mousePressEvent(QMouseEvent *event);
 private slots:
@@ -56,6 +57,9 @@ private slots:
     void tutorial_part_1();
     void tutorial_part_3();
     void tutorial_part_4();
+    void tutorial_part_5();
+    void tutorial_part_6();
+    void tutorial_part_7();
     void on_pushButton_3_clicked();
     void on_north_button_clicked();
     void on_south_button_clicked();
@@ -70,13 +74,17 @@ private slots:
     void update_health_bar();
     void on_tutorial_enemy_dead();
     void spawn_enemy(int, QPoint);
-
+    void fight_enemy_dead();
 private:
     Ui::MainMenu *ui;
     DB_Controller *dbc;
     Character *player = NULL;
     StoryThread *story_thread;
     QGraphicsScene *tutorial_scene;
+    QGraphicsScene *room_1_scene;
+    QGraphicsScene *room_2_scene;
+    QGraphicsScene *room_3_scene;
+    QGraphicsScene *room_4_scene;
     QSet<int> pressedKeys; //Holds all currently held down keys
     Container *active_container;
 
@@ -92,7 +100,19 @@ private:
     CustomRect *rect4;
     int tut_rect_counter = 0;
     bool tut_cont_first_time = true;
+    void room_1_setup();
+    void room_2_setup();
+    int fight_enemy_dead_counter = 0;
+
     QList<Enemy*> *active_enemy_list;
+
+    //Points on scene
+    QPoint right_middle = QPoint(920, 10);
+    QPoint right_top = QPoint(920, 250);
+    QPoint right_bottom = QPoint(920, -200);
+    QPoint left_middle = QPoint(0, 10);
+    QPoint left_top = QPoint(0, 250);
+    QPoint left_bottom = QPoint(0, -200);
 };
 
 #endif // MAINMENU_H

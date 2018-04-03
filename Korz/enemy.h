@@ -3,6 +3,7 @@
 #include <QPixmap>
 #include <QGraphicsItem>
 #include <QTimer>
+#include <QSoundEffect>
 class Character;
 
 class Enemy : public QObject, public QGraphicsPixmapItem
@@ -12,9 +13,10 @@ public:
     Enemy();
     Enemy(int t, Character *play, QPoint position);
     void hit(int dam);
-    int get_damage();
-    int get_direction();
-    int get_fire_rate();
+    int get_damage() const;
+    int get_direction() const;
+    int get_fire_rate() const;
+    int get_type() const;
     ~Enemy();
 private:
     int type;//Types: 1=normal{average attr} 2=fast{low health, high speed, avg dam, high aggro} 3={high health, slow, high dam,}
@@ -30,8 +32,10 @@ private:
     QPixmap pixmap_dead_right;
     QTimer *movement;
     QTimer *shooting;
+    QSoundEffect *gun_shot;
     Character *player;
     void die();
+    void destroy();
 private slots:
     void move();
     void shoot();

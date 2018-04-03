@@ -24,6 +24,8 @@ Character::Character(QString n, int str, int spd, int gn, int lk, int spc, QList
     left_pixmap = QPixmap(":/Icons/soldier-left.png");
     active_enemies = enemies;
     x_limit = 850;
+    gun_shot = new QSoundEffect(this);
+    gun_shot->setSource(QUrl::fromLocalFile(":/Sounds/gun_shot.wav"));
     set_current_weapon(new Weapon(0, "default", 10, 3));
     setFlag(QGraphicsItem::ItemIsFocusable);
     setPixmap(right_pixmap);
@@ -33,8 +35,12 @@ Character::Character(QString n, int str, int spd, int gn, int lk, int spc, QList
 void Character::keyPressEvent(QKeyEvent *event)
 {
     pressedKeys += (event)->key(); //When a key is pressed it gets stored in this array. When it is released it gets removed.
+
     if(pressedKeys.contains(Qt::Key_Space)){
         if(current_weapon->can_fire()){
+            if(gun_shot->isPlaying())
+                gun_shot->stop();
+            gun_shot->play();
             current_weapon->fire();
             Bullet *bullet = new Bullet(this, active_enemies);
             scene()->addItem(bullet);
@@ -159,7 +165,7 @@ void Character::keyReleaseEvent(QKeyEvent *event)
     pressedKeys -= (event)->key();
 }
 
-QString Character::get_name()
+QString Character::get_name() const
 {
     return name;
 }
@@ -169,7 +175,7 @@ void Character::set_name(QString n)
     name = n;
 }
 
-int Character::get_strength()
+int Character::get_strength() const
 {
     return strength;
 }
@@ -179,7 +185,7 @@ void Character::set_strength(int s)
     strength = s;
 }
 
-int Character::get_speed()
+int Character::get_speed() const
 {
     return speed;
 }
@@ -189,7 +195,7 @@ void Character::set_speed(int s)
     speed = s;
 }
 
-int Character::get_guns()
+int Character::get_guns() const
 {
     return guns;
 }
@@ -199,7 +205,8 @@ void Character::set_guns(int g)
     guns = g;
 }
 
-int Character::get_luck(){
+int Character::get_luck() const
+{
     return luck;
 }
 
@@ -208,7 +215,7 @@ void Character::set_luck(int l)
     luck = l;
 }
 
-int Character::get_special()
+int Character::get_special() const
 {
     return special_ability;
 }
@@ -218,7 +225,7 @@ void Character::set_special(int s)
     special_ability = s;
 }
 
-int Character::get_location()
+int Character::get_location() const
 {
     return location;
 }
@@ -228,7 +235,7 @@ void Character::set_location(int l)
     location = l;
 }
 
-int Character::get_health()
+int Character::get_health() const
 {
     return health;
 }
@@ -238,7 +245,12 @@ void Character::set_health(int h)
     health = h;
 }
 
-int Character::get_x_limit()
+int Character::get_max_health() const
+{
+    return max_health;
+}
+
+int Character::get_x_limit() const
 {
     return x_limit;
 }
@@ -248,11 +260,12 @@ void Character::set_x_limit(int limit)
     x_limit = limit;
 }
 
-int Character::get_direction(){
+int Character::get_direction()const
+{
     return direction;
 }
 
-QString Character::get_inventory()
+QString Character::get_inventory() const
 {
     return inventory_string;
 }
@@ -262,7 +275,7 @@ void Character::set_inventory(QString i)
     inventory_string = i;
 }
 
-int Character::get_inventory_size()
+int Character::get_inventory_size() const
 {
     QStringList item_list = inventory_string.split(":");
     if(item_list.length() > 0)
@@ -327,7 +340,7 @@ void Character::set_current_weapon(Weapon *w){
     current_weapon = w;
 }
 
-Weapon* Character::get_current_weapon()
+Weapon* Character::get_current_weapon() const
 {
     return current_weapon;
 }
@@ -342,8 +355,13 @@ void Character::use_medkit(Medkit *m){
     }
 }
 
-void Character::hit(int dam)
+void Character::hit(int dam, int enemy_type)
 {
+    if(enemy_type == 3){
+        QSoundEffect *explosion = new QSoundEffect(this);
+        explosion->setSource(QUrl::fromLocalFile(":/Sounds/explosion.wav"));
+        explosion->play();
+    }
     if(health - dam < 1){
         health = 0;
         emit update_health();

@@ -2,7 +2,6 @@
 #define CONTAINER_H
 #include <QString>
 #include <QGraphicsPixmapItem>
-#include "character.h"
 #include <QtMath>
 
 class Container : public QObject, public QGraphicsPixmapItem
@@ -11,14 +10,15 @@ class Container : public QObject, public QGraphicsPixmapItem
 private:
     int type;
     QString contents;
+    QString generate_items(int& seed);
+    QString generate_items();
 public:
     Container();
-    Container(int type, Character *player, QWidget *parent);
-    Container(int type, Character *player, QString contents, QWidget *parent);
-    int get_type();
-    QString get_contents();
-    QString generate_items();
-    Character *player;
+    Container(int type, QWidget *parent);
+    Container(int type, QWidget *parent, int seed);
+    Container(int type, QString contents, QWidget *parent);
+    int get_type() const;
+    QString get_contents() const;
     void remove_item(int);
     int add_item(int);
     QPixmap pixmap;

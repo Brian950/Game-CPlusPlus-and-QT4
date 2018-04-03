@@ -9,7 +9,7 @@ Bullet::Bullet(Character *parent, QList<Enemy*> *enemies)
 {
     type = 0;
     damage = parent->get_current_weapon()->get_damage();
-    speed = parent->get_guns();
+    speed = parent->get_guns()+1;
     direction = parent->get_direction();
     active_enemies = enemies;
     if(direction == 1){
@@ -21,9 +21,9 @@ Bullet::Bullet(Character *parent, QList<Enemy*> *enemies)
     setPixmap(pixmap);
     setScale(0.09);
     if(direction == 0)
-        setPos(parent->x()-35, parent->y()+13);
+        setPos(parent->x()-50, parent->y()+13);
     else
-        setPos(parent->x()+110, parent->y()+13);
+        setPos(parent->x()+125, parent->y()+13);
 
     QTimer *timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(move()));
@@ -37,12 +37,25 @@ Bullet::Bullet(Enemy *parent, Character *play)
     damage = parent->get_damage();
     speed = 3;
     direction = parent->get_direction();
-    if(direction == 1){
-        pixmap = QPixmap(":/Icons/enemy_bullet.png");
+    if(parent->get_type() != 3){
+        enemy_type = 1;
+        if(direction == 1){
+            pixmap = QPixmap(":/Icons/enemy_bullet.png");
+        }
+        else{
+            pixmap = QPixmap(":/Icons/enemy_bullet_left.png");
+        }
     }
     else{
-        pixmap = QPixmap(":/Icons/enemy_bullet_left.png");
+        enemy_type = 3;
+        if(direction == 1){
+            pixmap = QPixmap(":/Icons/missile.png");
+        }
+        else{
+            pixmap = QPixmap(":/Icons/missile_left.png");
+        }
     }
+
     setScale(0.09);
     setPixmap(pixmap);
     if(direction == 0)
@@ -55,7 +68,7 @@ Bullet::Bullet(Enemy *parent, Character *play)
     timer->start(10);
 }
 
-int Bullet::get_damage()
+int Bullet::get_damage() const
 {
     return damage;
 }
@@ -69,23 +82,32 @@ void Bullet::move(){
 
     QList<QGraphicsItem*> collisions = collidingItems();
     if(type == 1){
+        bool hit = false;
         for(int x = 0; x < collisions.length(); x++){
             if(collisions.at(x) == player){
-                player->hit(damage);
-                delete this;
+                player->hit(damage, enemy_type);
+                hit = true;
             }
             else
                 delete this;
         }
+        if(hit == true)
+            delete this;
     }
     else{
+        bool hit = false;
+        qDebug() << "active_enemies: " << active_enemies->length();
         for(int x = 0; x < collisions.length(); x++){
             for(int y = 0; y < active_enemies->length(); y++){
                 if(collisions.at(x) == active_enemies->at(y)){
                     active_enemies->at(y)->hit(damage);
-                    delete this;
+                    hit = true;
                 }
             }
+            hit = true;
+        }
+        if(hit == true){
+            delete this;
         }
     }
 

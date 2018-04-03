@@ -10,10 +10,11 @@ public:
     Bullet();
     Bullet(Character *parent, QList<Enemy*> *enemies);
     Bullet(Enemy *parent, Character *play);
-    int get_damage();
+    int get_damage() const;
     ~Bullet();
 private:
     int type; ///0 = player  1 = enemy
+    int enemy_type;
     int damage;
     int speed;
     int direction; //0 = left 1 = right

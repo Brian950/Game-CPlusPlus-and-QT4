@@ -1,6 +1,5 @@
 #include "storythread.h"
 #include "QDebug"
-#include "storythread.h"
 
 StoryThread::StoryThread(QObject *parent) : QThread(parent)
 {
@@ -8,6 +7,10 @@ StoryThread::StoryThread(QObject *parent) : QThread(parent)
     part_1_complete = false;
     part_2_complete = false;
     part_3_complete = false;
+    part_4_complete = false;
+    part_5_complete = false;
+    part_6_complete = false;
+    part_7_complete = false;
 }
 
 void StoryThread::run()
@@ -24,6 +27,15 @@ void StoryThread::run()
     }
     else if(part_4_complete == false){
         tutorial_part_4(tut_text_ptr);
+    }
+    else if(part_5_complete == false){
+        room_1_part_1(tut_text_ptr);
+    }
+    else if(part_6_complete == false){
+        room_2_part_1(tut_text_ptr);
+    }
+    else if(part_7_complete == false){
+        room_2_part_2(tut_text_ptr);
     }
 }
 
@@ -90,6 +102,41 @@ void StoryThread::tutorial_part_4(QStringList &tut_text_ptr)
         sleep(1);
         tut_text_position = x;
     }
-    emit spawn_tutorial_enemy();
     part_4_complete = true;
+}
+
+void StoryThread::room_1_part_1(QStringList &tut_text_ptr)
+{
+    QString line;
+    for(int x = tut_text_position; x < 12; x++){
+        line = tut_text_ptr.at(x);
+        emit update_story(line);
+        sleep(1);
+        tut_text_position = x;
+    }
+    part_5_complete = true;
+}
+
+void StoryThread::room_2_part_1(QStringList &tut_text_ptr){
+    QString line;
+    for(int x = tut_text_position; x < 15; x++){
+        line = tut_text_ptr.at(x);
+        emit update_story(line);
+        sleep(1);
+        tut_text_position = x;
+    }
+    emit start_fight();
+    part_6_complete = true;
+}
+
+void StoryThread::room_2_part_2(QStringList &tut_text_ptr){
+    QString line;
+    for(int x = tut_text_position; x < 18; x++){
+        line = tut_text_ptr.at(x);
+        emit update_story(line);
+        sleep(1);
+        tut_text_position = x;
+    }
+    emit start_fight();
+    part_7_complete = true;
 }

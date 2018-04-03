@@ -1,28 +1,55 @@
 #include "container.h"
+#include "character.h"
 #include <QDebug>
 
 Container::Container()
 {
 }
 
-Container::Container(int type, Character *player, QWidget *parent){
+Container::Container(int type, QWidget *parent){
     this->type = type;
     contents = generate_items();
+
     if(type == 1)
         pixmap = QPixmap(":/Icons/wooden_crate.png");
+    if(type == 2)
+        pixmap = QPixmap(":/Icons/trak2_panel2c.tga");
 
     setPixmap(pixmap);
     setScale(0.3);
     connect(this, SIGNAL(open_inventory(QString, Container*)), parent, SLOT(open_inventory(QString, Container*)));
 }
 
-Container::Container(int type, Character *player, QString contents, QWidget *parent)
-{
+Container::Container(int type, QWidget *parent, int seed){
     this->type = type;
+
+    //Reference example
+    int& seed_ref = seed;
+    contents = generate_items(seed_ref);
+
     if(type == 1)
         pixmap = QPixmap(":/Icons/wooden_crate.png");
+    if(type == 2)
+        pixmap = QPixmap(":/Icons/trak2_panel2c.tga");
+
+    setPixmap(pixmap);
+    setScale(0.3);
+    connect(this, SIGNAL(open_inventory(QString, Container*)), parent, SLOT(open_inventory(QString, Container*)));
+}
+
+
+Container::Container(int type, QString contents, QWidget *parent)
+{
+    this->type = type;
     this->contents = contents;
-    this->player = player;
+
+    if(type == 1)
+        pixmap = QPixmap(":/Icons/wooden_crate.png");
+    if(type == 2)
+        pixmap = QPixmap(":/Icons/trak2_panel2c.tga");
+
+    setPixmap(pixmap);
+    setScale(0.3);
     connect(this, SIGNAL(open_inventory(QString, Container*)), parent, SLOT(open_inventory(QString, Container*)));
 }
 
@@ -91,6 +118,67 @@ QString Container::generate_items(){
     return item_list;
 }
 
+QString Container::generate_items(int& seed){
+    QString item_list = "";
+
+    srand(time(0)+seed); //sets seed for rand
+    int rand_num_of_items = rand() % 2 + 1;
+    int rand_item_range;
+    for(int x = 0; x < rand_num_of_items; x++){
+        rand_item_range = rand() % 100 + 1;
+        if(rand_item_range < 5){//assault rifle
+            if(x == 0){
+                item_list.append(QString::number(3));
+            }
+            else{
+                item_list.append(":"+QString::number(3));
+            }
+        }
+        else if(rand_item_range < 10){//full medkit
+            if(x == 0){
+                item_list.append(QString::number(6));
+            }
+            else{
+                item_list.append(":"+QString::number(6));
+            }
+        }
+        else if(rand_item_range < 20){//bolt rifle
+            if(x == 0){
+                item_list.append(QString::number(2));
+            }
+            else{
+                item_list.append(":"+QString::number(2));
+            }
+        }
+        else if(rand_item_range < 40){//Medium medkit
+            if(x == 0){
+                item_list.append(QString::number(5));
+            }
+            else{
+                item_list.append(":"+QString::number(5));
+            }
+        }
+        else if(rand_item_range < 70){//Old rifle
+            if(x == 0){
+                item_list.append(QString::number(1));
+            }
+            else{
+                item_list.append(":"+QString::number(1));
+            }
+        }
+        else if(rand_item_range < 100){//small medkit
+            if(x == 0){
+                item_list.append(QString::number(4));
+            }
+            else{
+                item_list.append(":"+QString::number(4));
+            }
+        }
+    }
+    return item_list;
+}
+
+
 void Container::remove_item(int id)
 {
     QStringList item_list = contents.split(":");
@@ -140,11 +228,11 @@ int Container::add_item(int id)
     }
 }
 
-QString Container::get_contents(){
+QString Container::get_contents() const{
     return contents;
 }
 
-int Container::get_type(){
+int Container::get_type() const{
     return type;
 }
 

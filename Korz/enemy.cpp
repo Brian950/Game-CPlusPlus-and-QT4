@@ -12,32 +12,47 @@ Enemy::Enemy(int t, Character *play, QPoint position)
 
     if(type == 1){
         health = 75;
-        speed = 5;
+        speed = 10;
         aggro = 10;
-        fire_rate = 10;
+        fire_rate = 15;
         damage = 15;
+        gun_shot = new QSoundEffect(this);
+        pixmap_left = QPixmap(":/Icons/enemy_left.png");
+        pixmap_right = QPixmap(":/Icons/enemy.png");
+        setScale(2);
+        gun_shot->setVolume(5);
+        gun_shot->setSource(QUrl::fromLocalFile(":/Sounds/shotgun_shot.wav"));
     }
     else if(type == 2){
         health = 50;
-        speed = 10;
+        speed = 15;
         aggro = 20;
         fire_rate = 10;
-        damage = 15;
+        damage = 5;
+        pixmap_left = QPixmap(":/Icons/assault_enemy_left.png");
+        pixmap_right = QPixmap(":/Icons/assault_enemy.png");
+        setScale(0.2);
+        gun_shot = new QSoundEffect(this);
+        gun_shot->setSource(QUrl::fromLocalFile(":/Sounds/smg.wav"));
     }
     else if(type == 3){
         health = 75;
-        speed = 1;
+        speed = 5;
         aggro = 5;
-        fire_rate = 5;
+        fire_rate = 25;
         damage = 25;
+        pixmap_left = QPixmap(":/Icons/rocket_enemy_left.png");
+        pixmap_right = QPixmap(":/Icons/rocket_enemy.png");
+        setScale(1);
+        gun_shot = new QSoundEffect(this);
+        gun_shot->setSource(QUrl::fromLocalFile(":/Sounds/missile.wav"));
     }
 
     player = play;
-    pixmap_left = QPixmap(":/Icons/enemy_left.png");
-    pixmap_right = QPixmap(":/Icons/enemy.png");
     pixmap_dead_left = QPixmap(":/Icons/enemy_left_dead.png");
     pixmap_dead_right = QPixmap(":/Icons/enemy_right_dead.png");
-    setScale(2);
+
+    setZValue(-1);
     setPos(position);
     if(player->x() > x()){
         direction = 1;
@@ -64,17 +79,22 @@ void Enemy::hit(int dam)
         die();
 }
 
-int Enemy::get_damage()
+int Enemy::get_damage() const
 {
     return damage;
 }
 
-int Enemy::get_fire_rate()
+int Enemy::get_fire_rate() const
 {
     return fire_rate;
 }
 
-int Enemy::get_direction(){
+int Enemy::get_type() const
+{
+    return type;
+}
+
+int Enemy::get_direction() const{
     return direction;
 }
 
@@ -131,12 +151,17 @@ void Enemy::move()
 
 void Enemy::shoot()
 {
+    if(gun_shot->isPlaying()){
+        gun_shot->stop();
+    }
+    gun_shot->play();
     Bullet *bullet = new Bullet(this, player);
     scene()->addItem(bullet);
 }
 
 void Enemy::die()
 {
+    setScale(2);
     if(direction == 0){
         setPixmap(pixmap_dead_left);
         movement->stop();
