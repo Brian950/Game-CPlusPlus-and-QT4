@@ -1,4 +1,4 @@
-#include "bullet.h"
+ #include "bullet.h"
 
 Bullet::Bullet()
 {
@@ -9,7 +9,7 @@ Bullet::Bullet(Character *parent, QList<Enemy*> *enemies)
 {
     type = 0;
     damage = parent->get_current_weapon()->get_damage();
-    speed = parent->get_guns()+1;
+    speed = parent->get_guns()+2;
     direction = parent->get_direction();
     active_enemies = enemies;
     if(direction == 1){
@@ -23,7 +23,7 @@ Bullet::Bullet(Character *parent, QList<Enemy*> *enemies)
     if(direction == 0)
         setPos(parent->x()-50, parent->y()+13);
     else
-        setPos(parent->x()+125, parent->y()+13);
+        setPos(parent->x()+135, parent->y()+13);
 
     QTimer *timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(move()));
@@ -61,7 +61,7 @@ Bullet::Bullet(Enemy *parent, Character *play)
     if(direction == 0)
         setPos(parent->x()-50, parent->y());
     else
-        setPos(parent->x()+110, parent->y());
+        setPos(parent->x()+130, parent->y());
 
     QTimer *timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(move()));
@@ -82,16 +82,19 @@ void Bullet::move(){
 
     QList<QGraphicsItem*> collisions = collidingItems();
     if(type == 1){
-        bool hit = false;
+        bool player_hit = false;
+        bool object_hit = false;
         for(int x = 0; x < collisions.length(); x++){
             if(collisions.at(x) == player){
                 player->hit(damage, enemy_type);
-                hit = true;
+                player_hit = true;
             }
             else
-                delete this;
+                object_hit = true;
         }
-        if(hit == true)
+        if(player_hit == true)
+            delete this;
+        else if(object_hit)
             delete this;
     }
     else{

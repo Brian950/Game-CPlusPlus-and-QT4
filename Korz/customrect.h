@@ -14,7 +14,7 @@ class CustomRect : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    CustomRect(Character *player);
+    CustomRect(Character *player, int type);
     virtual ~CustomRect();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -23,6 +23,7 @@ public slots:
 private:
     bool deletable;
     Character *player;
+    int type;
 protected:
 
 signals:

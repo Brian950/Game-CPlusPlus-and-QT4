@@ -12,8 +12,8 @@ Enemy::Enemy(int t, Character *play, QPoint position)
 
     if(type == 1){
         health = 75;
-        speed = 10;
-        aggro = 10;
+        speed = 20;
+        aggro = 20;
         fire_rate = 15;
         damage = 15;
         gun_shot = new QSoundEffect(this);
@@ -37,8 +37,8 @@ Enemy::Enemy(int t, Character *play, QPoint position)
     }
     else if(type == 3){
         health = 75;
-        speed = 5;
-        aggro = 5;
+        speed = 8;
+        aggro = 30;
         fire_rate = 25;
         damage = 25;
         pixmap_left = QPixmap(":/Icons/rocket_enemy_left.png");
@@ -63,11 +63,11 @@ Enemy::Enemy(int t, Character *play, QPoint position)
         setPixmap(pixmap_left);
     }
 
-    movement = new QTimer();
+    movement = new QTimer(this);
     connect(movement, SIGNAL(timeout()), this, SLOT(move()));
     movement->start(200/speed);
 
-    shooting = new QTimer();
+    shooting = new QTimer(this);
     connect(shooting, SIGNAL(timeout()), this, SLOT(shoot()));
     shooting->start(100*fire_rate);
 }

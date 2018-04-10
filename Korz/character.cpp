@@ -32,6 +32,10 @@ Character::Character(QString n, int str, int spd, int gn, int lk, int spc, QList
     setScale(0.2);
 }
 
+Character::~Character()
+{
+}
+
 void Character::keyPressEvent(QKeyEvent *event)
 {
     pressedKeys += (event)->key(); //When a key is pressed it gets stored in this array. When it is released it gets removed.
@@ -291,8 +295,9 @@ int Character::get_inventory_size() const
 void Character::remove_item_from_inventory(int id)
 {
     QStringList item_list = inventory_string.split(":");
-    bool removed = false;
+
     if(item_list.length() > 0){
+        bool removed = false;
         for(int x = 0; x < item_list.length(); x++){
             if(!removed){
                 if(item_list.at(x).toInt() == id){
@@ -326,6 +331,7 @@ int Character::add_item_to_inventory(int id){
     }
     else if(inventory_string.length() == 1){
         inventory_string.append(":"+QString::number(id));
+        return 0;
     }
     else if(item_list.length() < 10){
         inventory_string.append(":"+QString::number(id));
@@ -337,6 +343,7 @@ int Character::add_item_to_inventory(int id){
 }
 
 void Character::set_current_weapon(Weapon *w){
+    delete current_weapon;
     current_weapon = w;
 }
 
@@ -355,26 +362,12 @@ void Character::use_medkit(Medkit *m){
     }
 }
 
-void Character::hit(int dam, int enemy_type)
-{
-    if(enemy_type == 3){
-        QSoundEffect *explosion = new QSoundEffect(this);
-        explosion->setSource(QUrl::fromLocalFile(":/Sounds/explosion.wav"));
-        explosion->play();
-    }
-    if(health - dam < 1){
-        health = 0;
-        emit update_health();
-        die();
-    }
-    else{
-        health = health-dam;
-        emit update_health();
-    }
-}
-
 void Character::die()
 {
 
+}
+
+void Character::clean_up(){
+    delete current_weapon;
 }
 

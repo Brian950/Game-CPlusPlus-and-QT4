@@ -14,7 +14,6 @@
 #include <storythread.h>
 #include <QDesktopWidget>
 #include "container.h"
-#include "playercollisionsthread.h"
 #include "weapon.h"
 #include "medkit.h"
 #include "enemy.h"
@@ -39,6 +38,7 @@ public slots:
     void open_inventory(QString, Container*);
     void spawn_tutorial_enemy();
     void start_fight();
+    void spawn_room_3_enemies();
 protected:
     void mousePressEvent(QMouseEvent *event);
 private slots:
@@ -60,6 +60,8 @@ private slots:
     void tutorial_part_5();
     void tutorial_part_6();
     void tutorial_part_7();
+    void tutorial_part_8();
+    void tutorial_part_9();
     void on_pushButton_3_clicked();
     void on_north_button_clicked();
     void on_south_button_clicked();
@@ -75,6 +77,16 @@ private slots:
     void on_tutorial_enemy_dead();
     void spawn_enemy(int, QPoint);
     void fight_enemy_dead();
+    void room_3_enemies_dead();
+    void spawn_key_card();
+    void pick_up_key_card();
+    void room_1_setup();
+    void room_2_setup();
+    void room_3_setup();
+    void room_4_setup();
+    void spawn_key_card_2();
+    void room_4_enemies_dead();
+    void clean_up_and_exit();
 private:
     Ui::MainMenu *ui;
     DB_Controller *dbc;
@@ -100,19 +112,22 @@ private:
     CustomRect *rect4;
     int tut_rect_counter = 0;
     bool tut_cont_first_time = true;
-    void room_1_setup();
-    void room_2_setup();
+
     int fight_enemy_dead_counter = 0;
+    int room_3_fight_enemy_dead_counter = 0;
+    int room_4_fight_enemy_dead_counter = 0;
 
     QList<Enemy*> *active_enemy_list;
 
     //Points on scene
     QPoint right_middle = QPoint(920, 10);
-    QPoint right_top = QPoint(920, 250);
-    QPoint right_bottom = QPoint(920, -200);
+    QPoint right_top = QPoint(850, 180);
+    QPoint right_bottom = QPoint(850, -200);
     QPoint left_middle = QPoint(0, 10);
-    QPoint left_top = QPoint(0, 250);
+    QPoint left_top = QPoint(0, 180);
     QPoint left_bottom = QPoint(0, -200);
+signals:
+    void clean_up();
 };
 
 #endif // MAINMENU_H

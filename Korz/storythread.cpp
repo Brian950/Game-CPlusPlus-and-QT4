@@ -11,6 +11,13 @@ StoryThread::StoryThread(QObject *parent) : QThread(parent)
     part_5_complete = false;
     part_6_complete = false;
     part_7_complete = false;
+    part_8_complete = false;
+    part_9_complete = false;
+    part_10_complete = false;
+    part_11_complete = false;
+    part_12_complete = false;
+    part_13_complete = false;
+    part_14_complete = false;
 }
 
 void StoryThread::run()
@@ -36,6 +43,24 @@ void StoryThread::run()
     }
     else if(part_7_complete == false){
         room_2_part_2(tut_text_ptr);
+    }
+    else if(part_8_complete == false){
+        room_3_part_1(tut_text_ptr);
+    }
+    else if(part_9_complete == false){
+        room_3_part_2(tut_text_ptr);
+    }
+    else if(part_10_complete == false){
+        room_2_part_3(tut_text_ptr);
+    }
+    else if(part_11_complete == false){
+        room_4_part_1(tut_text_ptr);
+    }
+    else if(part_12_complete == false){
+        room_4_part_2(tut_text_ptr);
+    }
+    else if(part_13_complete == false){
+        room_2_part_4(tut_text_ptr);
     }
 }
 
@@ -137,6 +162,73 @@ void StoryThread::room_2_part_2(QStringList &tut_text_ptr){
         sleep(1);
         tut_text_position = x;
     }
-    emit start_fight();
     part_7_complete = true;
+}
+
+void StoryThread::room_3_part_1(QStringList &tut_text_ptr){
+    QString line;
+    for(int x = tut_text_position; x < 19; x++){
+        line = tut_text_ptr.at(x);
+        emit update_story(line);
+        sleep(1);
+        tut_text_position = x;
+    }
+    emit spawn_room_3_enemies();
+    part_8_complete = true;
+}
+
+void StoryThread::room_3_part_2(QStringList &tut_text_ptr)
+{
+    QString line;
+    for(int x = tut_text_position; x < 20; x++){
+        line = tut_text_ptr.at(x);
+        emit update_story(line);
+        sleep(1);
+        tut_text_position = x;
+    }
+    part_9_complete = true;
+}
+
+void StoryThread::room_2_part_3(QStringList &tut_text_ptr){
+    QString line;
+    for(int x = tut_text_position; x < 21; x++){
+        line = tut_text_ptr.at(x);
+        emit update_story(line);
+        sleep(1);
+        tut_text_position = x;
+    }
+    part_10_complete = true;
+}
+
+void StoryThread::room_4_part_1(QStringList &tut_text_ptr){
+    QString line;
+    for(int x = tut_text_position; x < 22; x++){
+        line = tut_text_ptr.at(x);
+        emit update_story(line);
+        sleep(1);
+        tut_text_position = x;
+    }
+    part_11_complete = true;
+}
+
+void StoryThread::room_4_part_2(QStringList &tut_text_ptr){
+    QString line;
+    for(int x = tut_text_position; x < 23; x++){
+        line = tut_text_ptr.at(x);
+        emit update_story(line);
+        sleep(1);
+        tut_text_position = x;
+    }
+    part_12_complete = true;
+}
+
+void StoryThread::room_2_part_4(QStringList &tut_text_ptr){
+    QString line;
+    for(int x = tut_text_position; x < 24; x++){
+        line = tut_text_ptr.at(x);
+        emit update_story(line);
+        sleep(1);
+        tut_text_position = x;
+    }
+    part_13_complete = true;
 }

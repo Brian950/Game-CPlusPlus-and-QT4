@@ -67,6 +67,7 @@ int DB_Controller::number_of_characters(){
     }
     else{
         std::cout << "Failure on character count SELECT\n";
+        return 0;
     }
 }
 
@@ -102,4 +103,12 @@ int DB_Controller::get_item_id(QString name){
         }
     }
     return id;
+}
+
+void DB_Controller::close(){
+    kroz_db.close();
+}
+
+DB_Controller::~DB_Controller()
+{
 }

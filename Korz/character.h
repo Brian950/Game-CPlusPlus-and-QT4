@@ -23,8 +23,8 @@ private:
     int special_ability;
     int location;
     int direction; //0 = left  1 = right
-    int health;
-    int max_health;
+    double health;
+    double max_health;
     Weapon *current_weapon;
     QString inventory_string; //String of item ids separated by ':' to store inventory.
     int x_limit; //Sets limit on where on the screen the player can move to
@@ -34,6 +34,7 @@ private:
 public:
     Character();
     Character(QString, int, int, int, int, int, QList<Enemy*>*);
+    ~Character();
     QPixmap right_pixmap;
     QPixmap left_pixmap;
     QString get_name() const;
@@ -67,8 +68,28 @@ public:
     void set_current_weapon(Weapon*);
     Weapon* get_current_weapon() const;
     void use_medkit(Medkit*);
-    void hit(int dam, int enemy_type);
+
+    template <typename T>
+    void hit(T dam, int enemy_type)
+    {
+        if(enemy_type == 3){
+            QSoundEffect *explosion = new QSoundEffect(this);
+            explosion->setSource(QUrl::fromLocalFile(":/Sounds/explosion.wav"));
+            explosion->play();
+        }
+        if(health - dam < 1){
+            health = 0;
+            emit update_health();
+            die();
+        }
+        else{
+            health = health-dam;
+            emit update_health();
+        }
+    }
+
     void die();
+    void clean_up();
 signals:
     void update_health();
 };

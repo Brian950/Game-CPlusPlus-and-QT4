@@ -6,9 +6,10 @@ Container::Container()
 {
 }
 
-Container::Container(int type, QWidget *parent){
+Container::Container(int type, int player_luck, QWidget *parent){
     this->type = type;
     contents = generate_items();
+    this->player_luck = player_luck;
 
     if(type == 1)
         pixmap = QPixmap(":/Icons/wooden_crate.png");
@@ -18,13 +19,15 @@ Container::Container(int type, QWidget *parent){
     setPixmap(pixmap);
     setScale(0.3);
     connect(this, SIGNAL(open_inventory(QString, Container*)), parent, SLOT(open_inventory(QString, Container*)));
+    connect(parent, SIGNAL(clean_up()), this, SLOT(clean_up()));
 }
 
-Container::Container(int type, QWidget *parent, int seed){
+Container::Container(int type, int player_luck, QWidget *parent, int seed){
     this->type = type;
 
     //Reference example
     int& seed_ref = seed;
+    this->player_luck = player_luck;
     contents = generate_items(seed_ref);
 
     if(type == 1)
@@ -38,10 +41,11 @@ Container::Container(int type, QWidget *parent, int seed){
 }
 
 
-Container::Container(int type, QString contents, QWidget *parent)
+Container::Container(int type, int player_luck, QString contents, QWidget *parent)
 {
     this->type = type;
     this->contents = contents;
+    this->player_luck = player_luck;
 
     if(type == 1)
         pixmap = QPixmap(":/Icons/wooden_crate.png");
@@ -64,8 +68,9 @@ QString Container::generate_items(){
     srand(time(0)); //sets seed for rand
     int rand_num_of_items = rand() % 2 + 1;
     int rand_item_range;
+    int max_of_range = 100 - (player_luck*2);
     for(int x = 0; x < rand_num_of_items; x++){
-        rand_item_range = rand() % 100 + 1;
+        rand_item_range = rand() % max_of_range + 1;
         if(rand_item_range < 5){//assault rifle
             if(x == 0){
                 item_list.append(QString::number(3));
@@ -124,8 +129,9 @@ QString Container::generate_items(int& seed){
     srand(time(0)+seed); //sets seed for rand
     int rand_num_of_items = rand() % 2 + 1;
     int rand_item_range;
+    int max_of_range = 100 - (player_luck*2);
     for(int x = 0; x < rand_num_of_items; x++){
-        rand_item_range = rand() % 100 + 1;
+        rand_item_range = rand() % max_of_range + 1;
         if(rand_item_range < 5){//assault rifle
             if(x == 0){
                 item_list.append(QString::number(3));
@@ -182,8 +188,8 @@ QString Container::generate_items(int& seed){
 void Container::remove_item(int id)
 {
     QStringList item_list = contents.split(":");
-    bool removed = false;
     if(item_list.length() > 0){
+        bool removed = false;
         for(int x = 0; x < item_list.length(); x++){
             if(!removed){
                 if(item_list.at(x).toInt() == id){
@@ -218,6 +224,7 @@ int Container::add_item(int id)
     }
     else if(contents.length() == 1){
         contents.append(":"+QString::number(id));
+        return 0;
     }
     else if(item_list.length() < 10){
         contents.append(":"+QString::number(id));
@@ -236,4 +243,10 @@ int Container::get_type() const{
     return type;
 }
 
+void Container::clean_up()
+{
+    delete this;
+}
+
 Container::~Container(){}
+

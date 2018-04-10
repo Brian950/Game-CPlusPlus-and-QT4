@@ -14,17 +14,24 @@ Medkit::Medkit(int i, QString n, int hp)
     health = hp;
 }
 
-int Medkit::get_id()
+int Medkit::get_id() const
 {
     return id;
 }
 
-QString Medkit::get_name()
+QString Medkit::get_name() const
 {
     return name;
 }
 
-int Medkit::get_health()
+bool Medkit::compare_medkits(Medkit *b){
+    if(b = this)
+        return true;
+    else
+        return false;
+}
+
+int Medkit::get_health() const
 {
     return health;
 }

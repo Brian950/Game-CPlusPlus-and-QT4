@@ -504,7 +504,7 @@ void MainMenu::tutorial_part_1()
 }
 
 void MainMenu::tutorial_part_2(){
-    Container *tut_cont_1 = new Container(1, this);
+    Container *tut_cont_1 = new Container(1, player->get_luck(), this);
     tut_cont_1->setPos(450, 100);
     tut_cont_1->setZValue(-1);
     tutorial_scene->addItem(tut_cont_1);
@@ -531,20 +531,28 @@ void MainMenu::tutorial_part_7(){
     story_thread->start();
 }
 
+void MainMenu::tutorial_part_8(){
+    story_thread->start();
+}
+
+void MainMenu::tutorial_part_9(){
+    story_thread->start();
+}
+
 void MainMenu::spawn_tutorial_rects(){
-    rect1 = new CustomRect(player);
+    rect1 = new CustomRect(player, 1);
     rect1->setPos(40, -120);
     rect1->setZValue(-1);
     tutorial_scene->addItem(rect1);
-    rect2 = new CustomRect(player);
+    rect2 = new CustomRect(player, 1);
     rect2->setPos(40, 200);
     rect2->setZValue(-1);
     tutorial_scene->addItem(rect2);
-    rect3 = new CustomRect(player);
+    rect3 = new CustomRect(player, 1);
     rect3->setPos(200, -120);
     rect3->setZValue(-1);
     tutorial_scene->addItem(rect3);
-    rect4 = new CustomRect(player);
+    rect4 = new CustomRect(player, 1);
     rect4->setPos(200,200);
     rect4->setZValue(-1);
     tutorial_scene->addItem(rect4);
@@ -585,8 +593,7 @@ void MainMenu::on_tutorial_enemy_dead()
 
 void MainMenu::start_fight(){
     Enemy *enemy1 = new Enemy(1, player, right_middle);
-    //
-    Enemy *enemy2 = new Enemy(2, player, right_top);
+    Enemy *enemy2 = new Enemy(2, player, left_top);
     Enemy *enemy3 = new Enemy(3, player, right_bottom);
     room_2_scene->addItem(enemy1);
     active_enemy_list->append(enemy1);
@@ -612,17 +619,52 @@ void MainMenu::fight_enemy_dead(){
     }
 }
 
+void MainMenu::spawn_room_3_enemies(){
+    Enemy *enemy = new Enemy(3, player, right_middle);
+    Enemy *enemy2 = new Enemy(2, player, left_middle);
+    Enemy *enemy3 = new Enemy(1, player, right_bottom);
+    room_3_scene->addItem(enemy);
+    room_3_scene->addItem(enemy2);
+    room_3_scene->addItem(enemy3);
+    active_enemy_list->append(enemy);
+    active_enemy_list->append(enemy2);
+    active_enemy_list->append(enemy3);
+    connect(enemy, SIGNAL(dead()), this, SLOT(room_3_enemies_dead()));
+    connect(enemy2, SIGNAL(dead()), this, SLOT(room_3_enemies_dead()));
+    connect(enemy3, SIGNAL(dead()), this, SLOT(room_3_enemies_dead()));
+}
 
+void MainMenu::room_3_enemies_dead(){
+    room_3_fight_enemy_dead_counter++;
+    if(room_3_fight_enemy_dead_counter == 3){
+        spawn_key_card();
+    }
+}
+
+void MainMenu::spawn_key_card(){
+    CustomRect *key_card = new CustomRect(player, 2);
+    key_card->setPos(400, 0);
+    room_3_scene->addItem(key_card);
+    connect(key_card, SIGNAL(destroyed()), this, SLOT(pick_up_key_card()));
+}
+
+void MainMenu::pick_up_key_card(){
+    story_thread->start();
+}
 
 //Room setup
 void MainMenu::room_1_setup(){
+    //active_enemy_list->clear();
     room_1_scene = new QGraphicsScene(this);
     room_1_scene->setSceneRect(-50, -250, 1000, 600);
     room_1_scene->addItem(player);
     player->setPos(50, 0);
-    Container *wooden_box1 = new Container(1, this, 4895);
-    Container *wooden_box2 = new Container(1, this, 9987);
-    Container *wooden_box3 = new Container(1, this, 1564);
+    Container *wooden_box1 = new Container(1, player->get_luck(), this, 4895);
+    Container *wooden_box2 = new Container(1, player->get_luck(), this, 9987);
+    Container *wooden_box3 = new Container(1, player->get_luck(), this, 1564);
+    Enemy *enemy = new Enemy(2, player, right_middle);
+    room_1_scene->addItem(enemy);
+    active_enemy_list->append(enemy);
     wooden_box1->setPos(600, 0);
     wooden_box2->setPos(100, 100);
     wooden_box3->setPos(800, -100);
@@ -640,14 +682,15 @@ void MainMenu::room_1_setup(){
 
 void MainMenu::room_2_setup()
 {
+    //active_enemy_list->clear();
     room_2_scene = new QGraphicsScene(this);
     room_2_scene->setSceneRect(-50, -250, 1000, 600);
     room_2_scene->addItem(player);
     player->setPos(50, 0);
-    Container *metal_box1 = new Container(2, this, 4895);
-    Container *metal_box2 = new Container(2, this, 9987);
-    Container *metal_box3 = new Container(2, this, 1564);
-    Container *wooden_box1 = new Container(1, this, 9995);
+    Container *metal_box1 = new Container(2, player->get_luck(), this, 4895);
+    Container *metal_box2 = new Container(2, player->get_luck(), this, 9987);
+    Container *metal_box3 = new Container(2, player->get_luck(), this, 1564);
+    Container *wooden_box1 = new Container(1, player->get_luck(), this, 9995);
     metal_box1->setPos(300, 100);
     metal_box2->setPos(800, 0);
     metal_box3->setPos(100, 50);
@@ -661,20 +704,138 @@ void MainMenu::room_2_setup()
     room_2_scene->addItem(metal_box3);
     room_2_scene->addItem(wooden_box1);
     ui->game_view->setFocus();
-    room_1_scene->setFocus();
+    room_2_scene->setFocus();
     player->setFocus();
     ui->game_view->setStyleSheet("border-Image:url(:/Rooms/room_2.png);");
 }
 
+void MainMenu::room_3_setup(){
+    //active_enemy_list->clear();
+    room_3_scene = new QGraphicsScene(this);
+    room_3_scene->setSceneRect(-50, -250, 1000, 600);
+    room_3_scene->addItem(player);
+    Container *metal_box1 = new Container(2, player->get_luck(), this, 4895);
+    Container *wooden_box1 = new Container(1, player->get_luck(), this, 9995);
+    Container *wooden_box2 = new Container(1, player->get_luck(), this, 3225);
+    Container *wooden_box3 = new Container(1, player->get_luck(), this, 9040);
+    metal_box1->setPos(left_bottom);
+    wooden_box1->setPos(left_top);
+    wooden_box2->setPos(right_top);
+    wooden_box3->setPos(right_bottom);
+    metal_box1->setZValue(-1);
+    wooden_box1->setZValue(-1);
+    wooden_box2->setZValue(-1);
+    wooden_box3->setZValue(-1);
+    room_3_scene->addItem(metal_box1);
+    room_3_scene->addItem(wooden_box1);
+    room_3_scene->addItem(wooden_box2);
+    room_3_scene->addItem(wooden_box3);
+    ui->game_view->setFocus();
+    room_3_scene->setFocus();
+    player->setFocus();
+    ui->game_view->setStyleSheet("border-Image:url(:/Rooms/room_3.png);");
+    player->setPos(450, -70);
+    connect(story_thread, SIGNAL(spawn_room_3_enemies()), this, SLOT(spawn_room_3_enemies()));
+}
+
+void MainMenu::room_4_setup(){
+    //active_enemy_list->clear();
+    ui->game_view->setStyleSheet("border-Image:url(:/Rooms/room_4.png);");
+    room_4_scene = new QGraphicsScene(this);
+    room_4_scene->setSceneRect(-50, -250, 1000, 600);
+    room_4_scene->addItem(player);
+    player->setPos(400, 100);
+    Enemy *enemy = new Enemy(1, player, left_middle);
+    Enemy *enemy2 = new Enemy(2, player, right_middle);
+    active_enemy_list->append(enemy);
+    active_enemy_list->append(enemy2);
+    room_4_scene->addItem(enemy);
+    room_4_scene->addItem(enemy2);
+    connect(enemy, SIGNAL(dead()), this, SLOT(room_4_enemies_dead()));
+    connect(enemy2, SIGNAL(dead()), this, SLOT(room_4_enemies_dead()));
+    ui->game_view->setFocus();
+    room_4_scene->setFocus();
+    player->setFocus();
+    ui->game_view->setScene(room_4_scene);
+}
+
+void MainMenu::room_4_enemies_dead(){
+    room_4_fight_enemy_dead_counter++;
+    if(room_4_fight_enemy_dead_counter == 2){
+        Enemy *enemy = new Enemy(3, player, left_middle);
+        room_4_scene->addItem(enemy);
+        active_enemy_list->append(enemy);
+    }
+    else if(room_4_fight_enemy_dead_counter == 3){
+        spawn_key_card_2();
+    }
+}
+
+void MainMenu::spawn_key_card_2(){
+    CustomRect *key_card = new CustomRect(player, 2);
+    key_card->setPos(400, 0);
+    room_4_scene->addItem(key_card);
+    connect(key_card, SIGNAL(destroyed()), this, SLOT(pick_up_key_card()));
+}
+
+
 //Directional Buttons
 void MainMenu::on_north_button_clicked()
 {
-
+    if(!story_thread->part_6_complete){
+        QMessageBox msgBox;
+        msgBox.setText("You see no path to the north!");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+    }
+    else if(story_thread->part_6_complete && !story_thread->part_7_complete){
+        update_story(QString("You can't leave before eliminating the remaining enemies!"));
+    }
+    else if(story_thread->part_9_complete && !story_thread->part_10_complete){
+        update_story(QString("You've already found the keycard to the north!"));
+    }
+    else if(story_thread->part_7_complete && !story_thread->part_8_complete){
+        room_2_scene->removeItem(player);
+        room_3_setup();
+        ui->game_view->setScene(room_3_scene);
+        tutorial_part_8();
+    }
+    else if(story_thread->part_12_complete && !story_thread->part_13_complete){
+        room_4_scene->removeItem(player);
+        room_2_scene->addItem(player);
+        ui->game_view->setFocus();
+        room_2_scene->setFocus();
+        player->setFocus();
+        ui->game_view->setScene(room_2_scene);
+        ui->game_view->setStyleSheet("border-Image:url(:/Rooms/room_2.png);");
+        story_thread->start();
+    }
 }
 
 void MainMenu::on_south_button_clicked()
 {
-
+    if(!story_thread->part_9_complete){
+        QMessageBox msgBox;
+        msgBox.setText("The way is blocked!");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+    }
+    else if(!story_thread->part_10_complete){
+        room_3_scene->removeItem(player);
+        ui->game_view->setScene(room_2_scene);
+        ui->game_view->setStyleSheet("border-Image:url(:/Rooms/room_2.png);");
+        room_2_scene->addItem(player);
+        player->setPos(400, -100);
+        ui->game_view->setFocus();
+        room_2_scene->setFocus();
+        player->setFocus();
+        story_thread->start();
+    }
+    else if(story_thread->part_10_complete && !story_thread->part_11_complete){
+        room_2_scene->removeItem(player);
+        room_4_setup();
+        story_thread->start();
+    }
 }
 
 void MainMenu::on_east_button_clicked()
@@ -699,10 +860,40 @@ void MainMenu::on_east_button_clicked()
         ui->game_view->setScene(room_2_scene);
         tutorial_part_6();
     }
-
+    else if(story_thread->part_7_complete && !story_thread->part_9_complete){
+        QMessageBox msgBox;
+        msgBox.setText("You need two key cards to go through this door!");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+    }
+    if(story_thread->part_13_complete && !story_thread->part_14_complete){
+        QMessageBox msgBox;
+        msgBox.setText("Mission accomplished. Well done.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+        clean_up_and_exit();
+    }
 }
 
 void MainMenu::on_west_button_clicked()
 {
+    QMessageBox msgBox;
+    msgBox.setText("There is no honor in running!");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
+}
 
+void MainMenu::clean_up_and_exit()
+{
+    dbc->close();
+    delete dbc;
+    emit clean_up();
+    for(int i = 0; i < active_enemy_list->length(); i++){
+        delete active_enemy_list->at(i);
+    }
+    delete active_enemy_list;
+    player->clean_up();
+    delete player;
+    delete story_thread;
+    QApplication::quit();
 }

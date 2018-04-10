@@ -16,21 +16,29 @@ Weapon::Weapon(int i, QString n, int d, double fr)
     fire_rate = fr;
 }
 
-int Weapon::get_id()
+int Weapon::get_id() const
 {
     return id;
 }
 
-QString Weapon::get_name()
+QString Weapon::get_name() const
 {
     return name;
+}
+
+bool Weapon::compare_weapons(Weapon *b){
+    if(b = this){
+        return true;
+    }
+    else
+        return false;
 }
 
 void Weapon::set_name(QString name){
     this->name = name;
 }
 
-int Weapon::get_damage()
+int Weapon::get_damage() const
 {
     return damage;
 }
@@ -39,7 +47,7 @@ void Weapon::set_damage(int dam){
     damage = dam;
 }
 
-double Weapon::get_fire_rate()
+double Weapon::get_fire_rate() const
 {
     return fire_rate;
 }
@@ -52,7 +60,7 @@ void Weapon::fire()
 {
     if(ready_to_fire == true){
         ready_to_fire = false;
-        QTimer *timer = new QTimer();
+        QTimer *timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(set_ready()));
         timer->start(fire_rate*1000);
     }
